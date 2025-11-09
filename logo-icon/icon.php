@@ -1,0 +1,1 @@
+<link href="/certificate/logo/lgu.png" rel="icon">
