@@ -183,7 +183,7 @@ while ($result4 = $user_data->fetch(PDO::FETCH_ASSOC)) {
         <label style="color:yellow"> Emp ID: <?php echo $emp_id; ?></label>
 
         <br>
-        <label style="color:yellow"> Shedule Code: <?php echo $schedule; ?></label>
+        <label style="color:yellow"> Schedule Code: <?php echo $schedule; ?></label>
 
 
         <!-- <label style="color:yellow"> Shedule In: <?php echo $sched_in; ?></label> -->
