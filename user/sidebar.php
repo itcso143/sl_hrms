@@ -197,15 +197,11 @@ while ($result4 = $user_data->fetch(PDO::FETCH_ASSOC)) {
     <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
       <!-- Add icons to the links using the .nav-icon class
                with font-awesome or any other icon font library -->
-
       <?php
       date_default_timezone_set('Asia/Manila');
 
-      // Example schedule times (replace with DB values)
-
-
       // Example: from DB or form, a string like "SATURDAY - SUNDAY"
-
+      // $date_range, $sched_in, etc. should already be defined before this block
 
       // Convert string into array by splitting on '-' and normalize case
       $allowedDays = array_map('ucfirst', array_map('strtolower', array_map('trim', explode('-', $date_range))));
@@ -214,29 +210,20 @@ while ($result4 = $user_data->fetch(PDO::FETCH_ASSOC)) {
       $today = date('Y-m-d');
       $currentTimestamp = time();
 
-      // Convert to timestamps
+      // Convert to timestamp for scheduled in time
       $schedInTimestamp = strtotime("$today $sched_in");
-      $schedOutTimestamp = strtotime("$today $sched_out");
 
-      // Handle overnight schedules (e.g. 10PM–6AM)
-      if ($schedOutTimestamp <= $schedInTimestamp) {
-        $schedOutTimestamp = strtotime("+1 day", $schedOutTimestamp);
-      }
-
-      // Time window (30 minutes before sched_in until sched_out)
+      // Define window: show buttons 30 minutes before scheduled in
+      // and keep showing them for (for example) 12 hours after.
       $showButtonTime = $schedInTimestamp - (30 * 60);
-      $hideButtonTime = $schedOutTimestamp;
+      $hideButtonTime = $schedInTimestamp + (12 * 60 * 60); // ✅ 12 hours after sched_in
 
       // Get current day (e.g., "Saturday")
       $currentDay = date('l');
-
-      // Debug (optional)
-      // echo "Today is $currentDay<br>";
-      // print_r($allowedDays);
       ?>
 
       <ul class="navbar-nav w-100">
-        <?php if (!in_array($currentDay, $allowedDays)): ?> <!-- ✅ NOT in date_range -->
+        <?php if (!in_array($currentDay, $allowedDays)): ?>
           <?php if ($currentTimestamp >= $showButtonTime && $currentTimestamp <= $hideButtonTime): ?>
 
             <li class="nav-item w-100 text-center mb-1">
@@ -250,9 +237,9 @@ while ($result4 = $user_data->fetch(PDO::FETCH_ASSOC)) {
                   <button type="button" class="btn btn-primary px-4 py-2" data-bs-toggle="modal" data-bs-target="#timeOutModal">TIME OUT</button>
                 </div>
                 <br>
+
                 <!-- Break & Lunch Buttons -->
                 <div class="row">
-                  <!-- Break Button -->
                   <div class="col-md-6 text-center mb-3">
                     <?php if (empty($break_out) && empty($break_in)): ?>
                       <button type="button" class="btn btn-warning px-2 py-2" data-bs-toggle="modal" data-bs-target="#breakOutModal">BREAK OUT</button>
@@ -261,7 +248,6 @@ while ($result4 = $user_data->fetch(PDO::FETCH_ASSOC)) {
                     <?php endif; ?>
                   </div>
 
-                  <!-- Lunch Button -->
                   <div class="col-md-4 text-center mb-3">
                     <?php if (empty($lunch_out) && empty($lunch_in)): ?>
                       <button type="button" class="btn btn-warning px-2 py-2" data-bs-toggle="modal" data-bs-target="#lunchOutModal">LUNCH OUT</button>
@@ -270,7 +256,6 @@ while ($result4 = $user_data->fetch(PDO::FETCH_ASSOC)) {
                     <?php endif; ?>
                   </div>
                 </div>
-
 
               <?php elseif (!empty($punch_in) && !empty($punch_out)): ?>
                 <!-- Overtime -->
@@ -283,10 +268,9 @@ while ($result4 = $user_data->fetch(PDO::FETCH_ASSOC)) {
             </li>
 
           <?php endif; ?>
-        <?php else: ?>
-          <!-- Button hidden on non-working days (within date_range) -->
         <?php endif; ?>
       </ul>
+
 
 
       <!-- MODAL TIME IN-->
