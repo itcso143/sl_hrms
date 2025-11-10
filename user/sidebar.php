@@ -184,7 +184,7 @@ while ($result4 = $user_data->fetch(PDO::FETCH_ASSOC)) {
         <label style="color:yellow"> Shedule Code: <?php echo $schedule; ?></label>
         <br>
         <label style="color:yellow"> Shedule In: <?php echo $sched_in; ?></label>
-        <label style="color:yellow"> Shedule In: <?php echo $sched_out; ?></label>
+        <label style="color:yellow"> Shedule Out: <?php echo $sched_out; ?></label>
         <br>
         <label style="color:lightgreen"> <?php echo $now->format('Y-m-d'); ?> / ONLINE</label>
 
