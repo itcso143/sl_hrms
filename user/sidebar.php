@@ -45,7 +45,7 @@ while ($result4 = $user_data->fetch(PDO::FETCH_ASSOC)) {
 
   // Prepare SQL to get today's punch-in for this employee
   $get_user_logs_sql = "
-    SELECT emp_id, date_logs, punch_in, punch_out,overtime_in,overtime_out
+    SELECT emp_id, date_logs, punch_in, punch_out,overtime_in,overtime_out,break_out,break_in,lunch_out,lunch_in
     FROM tbl_employee_timelogs 
     WHERE emp_id = :emp_id 
       AND date_logs = :date_logs
@@ -60,12 +60,17 @@ while ($result4 = $user_data->fetch(PDO::FETCH_ASSOC)) {
 
   $result4 = $get_user_logs_data->fetch(PDO::FETCH_ASSOC);
 
+ 
   if ($result4) {
     $date_logs = $result4['date_logs'];
     $punch_in = $result4['punch_in'];
     $punch_out = $result4['punch_out'];
     $ot_in = $result4['overtime_in'];
     $ot_out = $result4['overtime_out'];
+    $break_out = $result4['break_out'];
+    $break_in = $result4['break_in'];
+    $lunch_out = $result4['lunch_out'];
+    $lunch_in = $result4['lunch_in'];
   } else {
     // No punch-in yet today
     $date_logs = null;
@@ -73,7 +78,12 @@ while ($result4 = $user_data->fetch(PDO::FETCH_ASSOC)) {
     $punch_out = null;
     $ot_in = null;
     $ot_out = null;
+    $break_out = null;
+    $break_in = null;
+    $lunch_out = null;
+    $lunch_in = null;
   }
+
 
   // TIME OUT
 
@@ -174,7 +184,7 @@ while ($result4 = $user_data->fetch(PDO::FETCH_ASSOC)) {
         <label style="color:yellow"> Shedule Code: <?php echo $schedule; ?></label>
         <br>
         <label style="color:yellow"> Shedule In: <?php echo $sched_in; ?></label>
-         <label style="color:yellow"> Shedule In: <?php echo $sched_out; ?></label>
+        <label style="color:yellow"> Shedule In: <?php echo $sched_out; ?></label>
         <br>
         <label style="color:lightgreen"> <?php echo $now->format('Y-m-d'); ?> / ONLINE</label>
 
@@ -188,14 +198,14 @@ while ($result4 = $user_data->fetch(PDO::FETCH_ASSOC)) {
       <!-- Add icons to the links using the .nav-icon class
                with font-awesome or any other icon font library -->
 
-   <?php
+      <?php
       date_default_timezone_set('Asia/Manila');
 
       // Example schedule times (replace with DB values)
-   
+
 
       // Example: from DB or form, a string like "SATURDAY - SUNDAY"
-   
+
 
       // Convert string into array by splitting on '-' and normalize case
       $allowedDays = array_map('ucfirst', array_map('strtolower', array_map('trim', explode('-', $date_range))));
@@ -225,22 +235,53 @@ while ($result4 = $user_data->fetch(PDO::FETCH_ASSOC)) {
       // print_r($allowedDays);
       ?>
 
-      <ul class="navbar-nav">
+      <ul class="navbar-nav w-100">
         <?php if (!in_array($currentDay, $allowedDays)): ?> <!-- ✅ NOT in date_range -->
           <?php if ($currentTimestamp >= $showButtonTime && $currentTimestamp <= $hideButtonTime): ?>
-            <li class="nav-item w-100 d-flex justify-content-center text-center">
-              <?php if (!empty($punch_in) && empty($punch_out)): ?>
-                <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#timeOutModal">TIME OUT</button>
-              <?php elseif (empty($punch_in)): ?>
-                <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#timeInModal">TIME IN</button>
+
+            <li class="nav-item w-100 text-center mb-1">
+              <?php if (empty($punch_in)): ?>
+                <!-- TIME IN -->
+                <button type="button" class="btn btn-primary px-4 py-2" data-bs-toggle="modal" data-bs-target="#timeInModal">TIME IN</button>
+
+              <?php elseif (!empty($punch_in) && empty($punch_out)): ?>
+                <!-- TIME OUT -->
+                <div class="row">
+                  <button type="button" class="btn btn-primary px-4 py-2" data-bs-toggle="modal" data-bs-target="#timeOutModal">TIME OUT</button>
+                </div>
+                <br>
+                <!-- Break & Lunch Buttons -->
+                <div class="row">
+                  <!-- Break Button -->
+                  <div class="col-md-6 text-center mb-3">
+                    <?php if (empty($break_out) && empty($break_in)): ?>
+                      <button type="button" class="btn btn-warning px-2 py-2" data-bs-toggle="modal" data-bs-target="#breakOutModal">BREAK OUT</button>
+                    <?php elseif (!empty($break_out) && empty($break_in)): ?>
+                      <button type="button" class="btn btn-danger px-2 py-2" data-bs-toggle="modal" data-bs-target="#breakInModal">BREAK IN</button>
+                    <?php endif; ?>
+                  </div>
+
+                  <!-- Lunch Button -->
+                  <div class="col-md-4 text-center mb-3">
+                    <?php if (empty($lunch_out) && empty($lunch_in)): ?>
+                      <button type="button" class="btn btn-warning px-2 py-2" data-bs-toggle="modal" data-bs-target="#lunchOutModal">LUNCH OUT</button>
+                    <?php elseif (!empty($lunch_out) && empty($lunch_in)): ?>
+                      <button type="button" class="btn btn-danger px-2 py-2" data-bs-toggle="modal" data-bs-target="#lunchInModal">LUNCH IN</button>
+                    <?php endif; ?>
+                  </div>
+                </div>
+
+
               <?php elseif (!empty($punch_in) && !empty($punch_out)): ?>
+                <!-- Overtime -->
                 <?php if (empty($ot_in)): ?>
-                  <button type="button" class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#overTimeInModal">OT - IN</button>
+                  <button type="button" class="btn btn-warning px-4 py-2" data-bs-toggle="modal" data-bs-target="#overTimeInModal">OT - IN</button>
                 <?php elseif (!empty($ot_in) && empty($ot_out)): ?>
-                  <button type="button" class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#overTimeOutModal">OT - OUT</button>
+                  <button type="button" class="btn btn-warning px-4 py-2" data-bs-toggle="modal" data-bs-target="#overTimeOutModal">OT - OUT</button>
                 <?php endif; ?>
               <?php endif; ?>
             </li>
+
           <?php endif; ?>
         <?php else: ?>
           <!-- Button hidden on non-working days (within date_range) -->
@@ -358,6 +399,124 @@ while ($result4 = $user_data->fetch(PDO::FETCH_ASSOC)) {
             <div class="modal-footer">
               <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
               <button type="button" id="save_ot_out" name="save_ot_out" class="btn btn-primary">Confirm OT - Out</button>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+       <!-- MODAL BREAK OUT-->
+      <div class="modal fade" id="breakOutModal" tabindex="-1" aria-labelledby="BreakOutModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+          <div class="modal-content">
+
+            <!-- MODAL HEADER -->
+            <div class="modal-header">
+              <h5 class="modal-title" id="breakOutModalLabel">Break Out</h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+
+            <!-- MODAL BODY -->
+            <div class="modal-body text-center">
+              <p>Click confirm to log your Break out.</p>
+              <h4 class="fw-bold mt-3">
+                Current Time: <span id="liveTimeBreakout" class="text-primary"></span>
+              </h4>
+            </div>
+
+            <!-- MODAL FOOTER -->
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+              <button type="button" id="save_time_breakout" name="save_time_breakout" class="btn btn-primary">Confirm Break Out</button>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+
+      <!-- MODAL BREAK IN-->
+      <div class="modal fade" id="breakInModal" tabindex="-1" aria-labelledby="BreakInModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+          <div class="modal-content">
+
+            <!-- MODAL HEADER -->
+            <div class="modal-header">
+              <h5 class="modal-title" id="BreakInModalLabel">Break In</h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+
+            <!-- MODAL BODY -->
+            <div class="modal-body text-center">
+              <p>Click confirm to log your Break In.</p>
+              <h4 class="fw-bold mt-3">
+                Current Time: <span id="liveTimeBreakIn" class="text-primary"></span>
+              </h4>
+            </div>
+
+            <!-- MODAL FOOTER -->
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+              <button type="button" id="save_time_breakin" name="save_time_breakin" class="btn btn-primary">Confirm Break In</button>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+
+        <!-- MODAL LUNCH OUT-->
+      <div class="modal fade" id="lunchOutModal" tabindex="-1" aria-labelledby="LunchOutModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+          <div class="modal-content">
+
+            <!-- MODAL HEADER -->
+            <div class="modal-header">
+              <h5 class="modal-title" id="lunchOutModalLabel">Lunch Out</h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+
+            <!-- MODAL BODY -->
+            <div class="modal-body text-center">
+              <p>Click confirm to log your Lunch out.</p>
+              <h4 class="fw-bold mt-3">
+                Current Time: <span id="liveTimeLunchout" class="text-primary"></span>
+              </h4>
+            </div>
+
+            <!-- MODAL FOOTER -->
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+              <button type="button" id="save_time_lunchout" name="save_time_lunchout" class="btn btn-primary">Confirm Lunch Out</button>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+         <!-- MODAL LUNCH IN-->
+      <div class="modal fade" id="lunchInModal" tabindex="-1" aria-labelledby="LunchInModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+          <div class="modal-content">
+
+            <!-- MODAL HEADER -->
+            <div class="modal-header">
+              <h5 class="modal-title" id="lunchInModalLabel">Lunch In</h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+
+            <!-- MODAL BODY -->
+            <div class="modal-body text-center">
+              <p>Click confirm to log your Lunch In.</p>
+              <h4 class="fw-bold mt-3">
+                Current Time: <span id="liveTimeLunchin" class="text-primary"></span>
+              </h4>
+            </div>
+
+            <!-- MODAL FOOTER -->
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+              <button type="button" id="save_time_lunchin" name="save_time_lunchin" class="btn btn-primary">Confirm Lunch In</button>
             </div>
 
           </div>
@@ -780,7 +939,270 @@ while ($result4 = $user_data->fetch(PDO::FETCH_ASSOC)) {
 </script>
 
 <script>
-setInterval(() => {
-  fetch('update_user_activity.php');
-}, 60000); // every 60 seconds
+  setInterval(() => {
+    fetch('update_user_activity.php');
+  }, 60000); // every 60 seconds
+</script>
+
+
+<!-- BREAK OUT -->
+
+<script>
+  function updateLiveTime() {
+    const now = new Date();
+    const options = {
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit',
+      hour12: false // force 24-hour format
+    };
+    document.getElementById("liveTimeBreakout").textContent = now.toLocaleTimeString([], options);
+  }
+
+  // Update every second
+  setInterval(updateLiveTime, 1000);
+
+  // Initialize immediately when modal opens
+  document.getElementById('breakOutModal').addEventListener('shown.bs.modal', updateLiveTime);
+</script>
+
+<script>
+  $(document).ready(function() {
+    $('#save_time_breakout').on('click', function() {
+      const now = new Date();
+      const breakout = now.toLocaleTimeString();
+
+      // Get emp_id from PHP
+      const emp_id = "<?php echo $emp_id; ?>"; // Inject PHP variable
+
+      // 🔍 Log the values to the browser console
+      console.log("Employee ID:", emp_id);
+      console.log("Break Out:", breakout);
+
+      // Disable button while saving
+      $('#save_time_breakout').prop('disabled', true).text('Saving...');
+
+      // AJAX request
+      $.ajax({
+        url: 'save_time_breakout.php',
+        type: 'POST',
+        data: {
+          emp_id: emp_id, // send employee ID
+          break_out: breakout // send current time
+        },
+        success: function(response) {
+          console.log('Server response:', response);
+          alert('Break Out saved successfully!');
+          $('#save_time_breakout').prop('disabled', false).text('Confirm Break Out');
+          $('#breakOutModal').modal('hide');
+
+          // 🔄 Reload the page
+          location.reload();
+        },
+        error: function(xhr, status, error) {
+          console.error('AJAX Error:', error);
+          alert('Something went wrong. Please try again.');
+          $('#save_time_breakout').prop('disabled', false).text('Confirm Break Out');
+        }
+      });
+    });
+  });
+</script>
+
+
+
+<!-- BREAK In -->
+
+<script>
+  function updateLiveTime() {
+    const now = new Date();
+    const options = {
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit',
+      hour12: false // force 24-hour format
+    };
+    document.getElementById("liveTimeBreakIn").textContent = now.toLocaleTimeString([], options);
+  }
+
+  // Update every second
+  setInterval(updateLiveTime, 1000);
+
+  // Initialize immediately when modal opens
+  document.getElementById('breakIntModal').addEventListener('shown.bs.modal', updateLiveTime);
+</script>
+
+<script>
+  $(document).ready(function() {
+    $('#save_time_breakin').on('click', function() {
+      const now = new Date();
+      const breakin = now.toLocaleTimeString();
+
+      // Get emp_id from PHP
+      const emp_id = "<?php echo $emp_id; ?>"; // Inject PHP variable
+
+      // 🔍 Log the values to the browser console
+      console.log("Employee ID:", emp_id);
+      console.log("Break In:", breakin);
+
+      // Disable button while saving
+      $('#save_time_breakin').prop('disabled', true).text('Saving...');
+
+      // AJAX request
+      $.ajax({
+        url: 'save_time_breakin.php',
+        type: 'POST',
+        data: {
+          emp_id: emp_id, // send employee ID
+          break_in: breakin // send current time
+        },
+        success: function(response) {
+          console.log('Server response:', response);
+          alert('Break In saved successfully!');
+          $('#save_time_breakin').prop('disabled', false).text('Confirm Break In');
+          $('#breakInModal').modal('hide');
+
+          // 🔄 Reload the page
+          location.reload();
+        },
+        error: function(xhr, status, error) {
+          console.error('AJAX Error:', error);
+          alert('Something went wrong. Please try again.');
+          $('#save_time_breakin').prop('disabled', false).text('Confirm Break In');
+        }
+      });
+    });
+  });
+</script>
+
+
+
+<!-- LUNCH OUT -->
+
+<script>
+  function updateLiveTime() {
+    const now = new Date();
+    const options = {
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit',
+      hour12: false // force 24-hour format
+    };
+    document.getElementById("liveTimeLunchout").textContent = now.toLocaleTimeString([], options);
+  }
+
+  // Update every second
+  setInterval(updateLiveTime, 1000);
+
+  // Initialize immediately when modal opens
+  document.getElementById('lunchOutModal').addEventListener('shown.bs.modal', updateLiveTime);
+</script>
+
+<script>
+  $(document).ready(function() {
+    $('#save_time_lunchout').on('click', function() {
+      const now = new Date();
+      const lunchout = now.toLocaleTimeString();
+
+      // Get emp_id from PHP
+      const emp_id = "<?php echo $emp_id; ?>"; // Inject PHP variable
+
+      // 🔍 Log the values to the browser console
+      console.log("Employee ID:", emp_id);
+      console.log("Lunch Out:", lunchout);
+
+      // Disable button while saving
+      $('#save_time_lunchout').prop('disabled', true).text('Saving...');
+
+      // AJAX request
+      $.ajax({
+        url: 'save_time_lunchout.php',
+        type: 'POST',
+        data: {
+          emp_id: emp_id, // send employee ID
+          lunch_out: lunchout // send current time
+        },
+        success: function(response) {
+          console.log('Server response:', response);
+          alert('Lunch Out saved successfully!');
+          $('#save_time_lunchout').prop('disabled', false).text('Confirm Lunch Out');
+          $('#lunchOutModal').modal('hide');
+
+          // 🔄 Reload the page
+          location.reload();
+        },
+        error: function(xhr, status, error) {
+          console.error('AJAX Error:', error);
+          alert('Something went wrong. Please try again.');
+          $('#save_time_lunchout').prop('disabled', false).text('Confirm Lunch Out');
+        }
+      });
+    });
+  });
+</script>
+
+
+
+<!-- LUNCH IN -->
+
+<script>
+  function updateLiveTime() {
+    const now = new Date();
+    const options = {
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit',
+      hour12: false // force 24-hour format
+    };
+    document.getElementById("liveTimeLunchin").textContent = now.toLocaleTimeString([], options);
+  }
+
+  // Update every second
+  setInterval(updateLiveTime, 1000);
+
+  // Initialize immediately when modal opens
+  document.getElementById('lunchInModal').addEventListener('shown.bs.modal', updateLiveTime);
+</script>
+
+<script>
+  $(document).ready(function() {
+    $('#save_time_lunchin').on('click', function() {
+      const now = new Date();
+      const lunchin = now.toLocaleTimeString();
+
+      // Get emp_id from PHP
+      const emp_id = "<?php echo $emp_id; ?>"; // Inject PHP variable
+
+      // 🔍 Log the values to the browser console
+      console.log("Employee ID:", emp_id);
+      console.log("Lunch In:", lunchin);
+
+      // Disable button while saving
+      $('#save_time_lunchin').prop('disabled', true).text('Saving...');
+
+      // AJAX request
+      $.ajax({
+        url: 'save_time_lunchin.php',
+        type: 'POST',
+        data: {
+          emp_id: emp_id, // send employee ID
+          lunch_in: lunchin // send current time
+        },
+        success: function(response) {
+          console.log('Server response:', response);
+          alert('Lunch In saved successfully!');
+          $('#save_time_lunchin').prop('disabled', false).text('Confirm Lunch In');
+          $('#lunchInModal').modal('hide');
+
+          // 🔄 Reload the page
+          location.reload();
+        },
+        error: function(xhr, status, error) {
+          console.error('AJAX Error:', error);
+          alert('Something went wrong. Please try again.');
+          $('#save_time_lunchin').prop('disabled', false).text('Confirm Lunch In');
+        }
+      });
+    });
+  });
 </script>
