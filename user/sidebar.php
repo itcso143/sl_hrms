@@ -197,80 +197,88 @@ while ($result4 = $user_data->fetch(PDO::FETCH_ASSOC)) {
     <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
       <!-- Add icons to the links using the .nav-icon class
                with font-awesome or any other icon font library -->
-      <?php
-      date_default_timezone_set('Asia/Manila');
+<?php
+date_default_timezone_set('Asia/Manila');
 
-      // Example: from DB or form, a string like "SATURDAY - SUNDAY"
-      // $date_range, $sched_in, etc. should already be defined before this block
+// Convert string into array by splitting on '-' and normalize case
+$allowedDays = array_map('ucfirst', array_map('strtolower', array_map('trim', explode('-', $date_range))));
 
-      // Convert string into array by splitting on '-' and normalize case
-      $allowedDays = array_map('ucfirst', array_map('strtolower', array_map('trim', explode('-', $date_range))));
+// Get current date and time
+$today = date('Y-m-d');
+$currentTimestamp = time();
 
-      // Get current date and time
-      $today = date('Y-m-d');
-      $currentTimestamp = time();
+// Convert to timestamps
+$schedInTimestamp = strtotime("$today $sched_in");
+$schedOutTimestamp = strtotime("$today $sched_out");
 
-      // Convert to timestamp for scheduled in time
-      $schedInTimestamp = strtotime("$today $sched_in");
+// Handle overnight schedules (e.g. 10PM–6AM)
+if ($schedOutTimestamp <= $schedInTimestamp) {
+  $schedOutTimestamp = strtotime("+1 day", $schedOutTimestamp);
+}
 
-      // Define window: show buttons 30 minutes before scheduled in
-      // and keep showing them for (for example) 12 hours after.
-      $showButtonTime = $schedInTimestamp - (30 * 60);
-      $hideButtonTime = $schedInTimestamp + (12 * 60 * 60); // ✅ 12 hours after sched_in
+// Time window (30 minutes before sched_in until sched_out)
+$showButtonTime = $schedInTimestamp - (30 * 60);
+$hideButtonTime = $schedOutTimestamp;
 
-      // Get current day (e.g., "Saturday")
-      $currentDay = date('l');
-      ?>
+// Hide TIME OUT button 30 minutes after sched_out
+$hideTimeOutButtonTime = $schedOutTimestamp + (30 * 60); // ✅ 30 minutes after sched_out
 
-      <ul class="navbar-nav w-100">
-        <?php if (!in_array($currentDay, $allowedDays)): ?>
-          <?php if ($currentTimestamp >= $showButtonTime && $currentTimestamp <= $hideButtonTime): ?>
+// Get current day (e.g., "Saturday")
+$currentDay = date('l');
+?>
 
-            <li class="nav-item w-100 text-center mb-1">
-              <?php if (empty($punch_in)): ?>
-                <!-- TIME IN -->
-                <button type="button" class="btn btn-primary px-4 py-2" data-bs-toggle="modal" data-bs-target="#timeInModal">TIME IN</button>
+<ul class="navbar-nav w-100">
+  <?php if (!in_array($currentDay, $allowedDays)): ?> <!-- ✅ NOT in date_range -->
+    <?php if ($currentTimestamp >= $showButtonTime && $currentTimestamp <= $hideButtonTime + (30 * 60)): ?>
 
-              <?php elseif (!empty($punch_in) && empty($punch_out)): ?>
-                <!-- TIME OUT -->
-                <div class="row">
-                  <button type="button" class="btn btn-primary px-4 py-2" data-bs-toggle="modal" data-bs-target="#timeOutModal">TIME OUT</button>
-                </div>
-                <br>
+      <li class="nav-item w-100 text-center mb-1">
+        <?php if (empty($punch_in)): ?>
+          <!-- TIME IN -->
+          <button type="button" class="btn btn-primary px-4 py-2" data-bs-toggle="modal" data-bs-target="#timeInModal">TIME IN</button>
 
-                <!-- Break & Lunch Buttons -->
-                <div class="row">
-                  <div class="col-md-6 text-center mb-3">
-                    <?php if (empty($break_out) && empty($break_in)): ?>
-                      <button type="button" class="btn btn-warning px-2 py-2" data-bs-toggle="modal" data-bs-target="#breakOutModal">BREAK OUT</button>
-                    <?php elseif (!empty($break_out) && empty($break_in)): ?>
-                      <button type="button" class="btn btn-danger px-2 py-2" data-bs-toggle="modal" data-bs-target="#breakInModal">BREAK IN</button>
-                    <?php endif; ?>
-                  </div>
+        <?php elseif (!empty($punch_in) && empty($punch_out)): ?>
+          <!-- TIME OUT -->
+          <?php if ($currentTimestamp <= $hideTimeOutButtonTime): ?> <!-- ✅ Hide 30 min after sched_out -->
+            <div class="row">
+              <button type="button" class="btn btn-primary px-4 py-2" data-bs-toggle="modal" data-bs-target="#timeOutModal">TIME OUT</button>
+            </div>
+          <?php endif; ?>
+          <br>
 
-                  <div class="col-md-4 text-center mb-3">
-                    <?php if (empty($lunch_out) && empty($lunch_in)): ?>
-                      <button type="button" class="btn btn-warning px-2 py-2" data-bs-toggle="modal" data-bs-target="#lunchOutModal">LUNCH OUT</button>
-                    <?php elseif (!empty($lunch_out) && empty($lunch_in)): ?>
-                      <button type="button" class="btn btn-danger px-2 py-2" data-bs-toggle="modal" data-bs-target="#lunchInModal">LUNCH IN</button>
-                    <?php endif; ?>
-                  </div>
-                </div>
-
-              <?php elseif (!empty($punch_in) && !empty($punch_out)): ?>
-                <!-- Overtime -->
-                <?php if (empty($ot_in)): ?>
-                  <button type="button" class="btn btn-warning px-4 py-2" data-bs-toggle="modal" data-bs-target="#overTimeInModal">OT - IN</button>
-                <?php elseif (!empty($ot_in) && empty($ot_out)): ?>
-                  <button type="button" class="btn btn-warning px-4 py-2" data-bs-toggle="modal" data-bs-target="#overTimeOutModal">OT - OUT</button>
-                <?php endif; ?>
+          <!-- Break & Lunch Buttons -->
+          <div class="row">
+            <!-- Break Button -->
+            <div class="col-md-6 text-center mb-3">
+              <?php if (empty($break_out) && empty($break_in)): ?>
+                <button type="button" class="btn btn-warning px-2 py-2" data-bs-toggle="modal" data-bs-target="#breakOutModal">BREAK OUT</button>
+              <?php elseif (!empty($break_out) && empty($break_in)): ?>
+                <button type="button" class="btn btn-danger px-2 py-2" data-bs-toggle="modal" data-bs-target="#breakInModal">BREAK IN</button>
               <?php endif; ?>
-            </li>
+            </div>
 
+            <!-- Lunch Button -->
+            <div class="col-md-4 text-center mb-3">
+              <?php if (empty($lunch_out) && empty($lunch_in)): ?>
+                <button type="button" class="btn btn-warning px-2 py-2" data-bs-toggle="modal" data-bs-target="#lunchOutModal">LUNCH OUT</button>
+              <?php elseif (!empty($lunch_out) && empty($lunch_in)): ?>
+                <button type="button" class="btn btn-danger px-2 py-2" data-bs-toggle="modal" data-bs-target="#lunchInModal">LUNCH IN</button>
+              <?php endif; ?>
+            </div>
+          </div>
+
+        <?php elseif (!empty($punch_in) && !empty($punch_out)): ?>
+          <!-- Overtime -->
+          <?php if (empty($ot_in)): ?>
+            <button type="button" class="btn btn-warning px-4 py-2" data-bs-toggle="modal" data-bs-target="#overTimeInModal">OT - IN</button>
+          <?php elseif (!empty($ot_in) && empty($ot_out)): ?>
+            <button type="button" class="btn btn-warning px-4 py-2" data-bs-toggle="modal" data-bs-target="#overTimeOutModal">OT - OUT</button>
           <?php endif; ?>
         <?php endif; ?>
-      </ul>
+      </li>
 
+    <?php endif; ?>
+  <?php endif; ?>
+</ul>
 
 
       <!-- MODAL TIME IN-->
