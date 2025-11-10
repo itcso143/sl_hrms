@@ -60,7 +60,7 @@ while ($result4 = $user_data->fetch(PDO::FETCH_ASSOC)) {
 
   $result4 = $get_user_logs_data->fetch(PDO::FETCH_ASSOC);
 
- 
+
   if ($result4) {
     $date_logs = $result4['date_logs'];
     $punch_in = $result4['punch_in'];
@@ -405,7 +405,7 @@ while ($result4 = $user_data->fetch(PDO::FETCH_ASSOC)) {
         </div>
       </div>
 
-       <!-- MODAL BREAK OUT-->
+      <!-- MODAL BREAK OUT-->
       <div class="modal fade" id="breakOutModal" tabindex="-1" aria-labelledby="BreakOutModalLabel" aria-hidden="true">
         <div class="modal-dialog">
           <div class="modal-content">
@@ -435,15 +435,16 @@ while ($result4 = $user_data->fetch(PDO::FETCH_ASSOC)) {
       </div>
 
 
-      <!-- MODAL BREAK IN-->
-      <div class="modal fade" id="breakInModal" tabindex="-1" aria-labelledby="BreakInModalLabel" aria-hidden="true">
+      <!-- MODAL BREAK IN -->
+      <div class="modal fade" id="breakInModal" tabindex="-1" aria-labelledby="BreakInModalLabel" aria-hidden="true"
+        data-bs-backdrop="static" data-bs-keyboard="false">
         <div class="modal-dialog">
           <div class="modal-content">
 
             <!-- MODAL HEADER -->
             <div class="modal-header">
               <h5 class="modal-title" id="BreakInModalLabel">Break In</h5>
-              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+              <!-- Optional: Remove close button so user cannot dismiss -->
             </div>
 
             <!-- MODAL BODY -->
@@ -456,8 +457,9 @@ while ($result4 = $user_data->fetch(PDO::FETCH_ASSOC)) {
 
             <!-- MODAL FOOTER -->
             <div class="modal-footer">
-              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-              <button type="button" id="save_time_breakin" name="save_time_breakin" class="btn btn-primary">Confirm Break In</button>
+              <button type="button" id="save_time_breakin" name="save_time_breakin" class="btn btn-primary">
+                Confirm Break In
+              </button>
             </div>
 
           </div>
@@ -465,7 +467,8 @@ while ($result4 = $user_data->fetch(PDO::FETCH_ASSOC)) {
       </div>
 
 
-        <!-- MODAL LUNCH OUT-->
+
+      <!-- MODAL LUNCH OUT-->
       <div class="modal fade" id="lunchOutModal" tabindex="-1" aria-labelledby="LunchOutModalLabel" aria-hidden="true">
         <div class="modal-dialog">
           <div class="modal-content">
@@ -494,15 +497,17 @@ while ($result4 = $user_data->fetch(PDO::FETCH_ASSOC)) {
         </div>
       </div>
 
-         <!-- MODAL LUNCH IN-->
-      <div class="modal fade" id="lunchInModal" tabindex="-1" aria-labelledby="LunchInModalLabel" aria-hidden="true">
+      <!-- MODAL LUNCH IN -->
+      <div class="modal fade" id="lunchInModal" tabindex="-1" aria-labelledby="LunchInModalLabel" aria-hidden="true"
+        data-bs-backdrop="static" data-bs-keyboard="false">
         <div class="modal-dialog">
           <div class="modal-content">
 
             <!-- MODAL HEADER -->
             <div class="modal-header">
-              <h5 class="modal-title" id="lunchInModalLabel">Lunch In</h5>
-              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+              <h5 class="modal-title" id="LunchInModalLabel">Lunch In</h5>
+              <!-- Remove close button so modal cannot be closed manually -->
+              <!-- <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button> -->
             </div>
 
             <!-- MODAL BODY -->
@@ -515,13 +520,15 @@ while ($result4 = $user_data->fetch(PDO::FETCH_ASSOC)) {
 
             <!-- MODAL FOOTER -->
             <div class="modal-footer">
-              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-              <button type="button" id="save_time_lunchin" name="save_time_lunchin" class="btn btn-primary">Confirm Lunch In</button>
+              <button type="button" id="save_time_lunchin" name="save_time_lunchin" class="btn btn-primary">
+                Confirm Lunch In
+              </button>
             </div>
 
           </div>
         </div>
       </div>
+
 
       <li class="nav-item has-treeview">
         <a href="#" class="nav-link">
@@ -996,8 +1003,7 @@ while ($result4 = $user_data->fetch(PDO::FETCH_ASSOC)) {
           $('#save_time_breakout').prop('disabled', false).text('Confirm Break Out');
           $('#breakOutModal').modal('hide');
 
-          // 🔄 Reload the page
-          location.reload();
+          $('#breakInModal').modal('show');
         },
         error: function(xhr, status, error) {
           console.error('AJAX Error:', error);
@@ -1073,6 +1079,12 @@ while ($result4 = $user_data->fetch(PDO::FETCH_ASSOC)) {
       });
     });
   });
+
+  var breakInModal = new bootstrap.Modal(document.getElementById('breakInModal'));
+  document.getElementById('save_time_breakin').addEventListener('click', function() {
+    // Your save logic here
+    breakInModal.hide(); // closes the modal
+  });
 </script>
 
 
@@ -1128,8 +1140,7 @@ while ($result4 = $user_data->fetch(PDO::FETCH_ASSOC)) {
           $('#save_time_lunchout').prop('disabled', false).text('Confirm Lunch Out');
           $('#lunchOutModal').modal('hide');
 
-          // 🔄 Reload the page
-          location.reload();
+          $('#lunchInModal').modal('show');
         },
         error: function(xhr, status, error) {
           console.error('AJAX Error:', error);

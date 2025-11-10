@@ -472,7 +472,7 @@ while ($result4 = $user_data->fetch(PDO::FETCH_ASSOC)) {
       </div>
 
 
-        <!-- MODAL LUNCH OUT-->
+      <!-- MODAL LUNCH OUT-->
       <div class="modal fade" id="lunchOutModal" tabindex="-1" aria-labelledby="LunchOutModalLabel" aria-hidden="true">
         <div class="modal-dialog">
           <div class="modal-content">
@@ -501,7 +501,7 @@ while ($result4 = $user_data->fetch(PDO::FETCH_ASSOC)) {
         </div>
       </div>
 
-         <!-- MODAL LUNCH IN-->
+      <!-- MODAL LUNCH IN-->
       <div class="modal fade" id="lunchInModal" tabindex="-1" aria-labelledby="LunchInModalLabel" aria-hidden="true">
         <div class="modal-dialog">
           <div class="modal-content">
@@ -1058,8 +1058,9 @@ while ($result4 = $user_data->fetch(PDO::FETCH_ASSOC)) {
           $('#save_time_breakout').prop('disabled', false).text('Confirm Break Out');
           $('#breakOutModal').modal('hide');
 
-          // 🔄 Reload the page
-          location.reload();
+
+
+          $('#breakInModal').modal('show');
         },
         error: function(xhr, status, error) {
           console.error('AJAX Error:', error);
@@ -1189,9 +1190,8 @@ while ($result4 = $user_data->fetch(PDO::FETCH_ASSOC)) {
           alert('Lunch Out saved successfully!');
           $('#save_time_lunchout').prop('disabled', false).text('Confirm Lunch Out');
           $('#lunchOutModal').modal('hide');
-
-          // 🔄 Reload the page
-          location.reload();
+          
+          $('#lunchInModal').modal('show');
         },
         error: function(xhr, status, error) {
           console.error('AJAX Error:', error);
