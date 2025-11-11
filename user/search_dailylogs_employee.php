@@ -20,18 +20,14 @@ $user_data->execute([':id' => $user_id]);
 while ($result = $user_data->fetch(PDO::FETCH_ASSOC)) {
 
 
-  $emp_id = $result['emp_id'];
-
+    $emp_id = $result['emp_id'];
 }
 
 // storing  request (ie, get/post) global array to a variable  
 $requestData = $_REQUEST;
 
 
-$get_employee_sql = "SELECT t.date_logs,t.schedule_code,t.emp_id,
-(SELECT punch_in FROM tbl_employee_timelogs WHERE emp_id='$emp_id' AND punch_in !='' LIMIT 1) AS punch_in,
-(SELECT punch_out FROM tbl_employee_timelogs WHERE emp_id='$emp_id' AND punch_out !='' LIMIT 1) AS punch_out,
-t.late,t.work_hours,t.overtime_in,t.overtime_out,r.fullname FROM tbl_employee_timelogs t LEFT JOIN tbl_employee_info r ON r.emp_id=t.emp_id  WHERE t.emp_id = 'EMP-3445'  ORDER BY t.id DESC";
+$get_employee_sql = "SELECT date_logs,punch_in,punch_out,break_in,break_out,lunch_in,lunch_out,late FROM tbl_employee_timelogs  WHERE emp_id = '$emp_id'  order by id DESC";
 
 $getIndividualData = $con->prepare($get_employee_sql);
 $getIndividualData->execute();
@@ -74,16 +70,16 @@ $data = array();
 
 while ($row = $getIndividualData->fetch(PDO::FETCH_ASSOC)) {
     $nestedData = array();
-    $nestedData[] = $row["emp_id"];
-    $nestedData[] = strtoupper($row["fullname"]);
-    $nestedData[] = strtoupper($row["schedule_code"]);
     $nestedData[] = $row["date_logs"];
     $nestedData[] = $row["punch_in"];
     $nestedData[] = $row["punch_out"];
-   $nestedData[] = '<span style="color:red;">' . $row["late"] . '</span>';
-   
-    $nestedData[] = $row["overtime_in"];
-    $nestedData[] = $row["overtime_out"];
+    $nestedData[] = $row["break_in"];
+    $nestedData[] = $row["break_out"];
+    $nestedData[] = $row["lunch_in"];
+    $nestedData[] = $row["lunch_out"];
+
+    $nestedData[] = '<span style="color:red;">' . $row["late"] . '</span>';
+
 
 
 
@@ -100,6 +96,3 @@ $json_data = array(
 );
 
 echo json_encode($json_data);  // send data as json format
-
-
-
