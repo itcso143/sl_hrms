@@ -372,18 +372,18 @@ FROM tbl_employee_timelogs t ORDER BY t.id DESC LIMIT 1;";
                   <button type="button" id="save_time_in" class="btn btn-primary px-3">Time In</button>
                 </div>
                 <div class="col-auto">
-                  <button type="button" id="save_time_breakout2" class="btn btn-warning px-3">Break In</button>
+                  <button type="button" id="save_time_breakin2" class="btn btn-warning px-3">Break In</button>
                 </div>
 
                 <div class="col-auto">
-                  <button type="button" id="save_time_breakin2" class="btn btn-danger px-3">Break Out</button>
+                  <button type="button" id="save_time_breakout2" class="btn btn-danger px-3">Break Out</button>
                 </div>
                 <div class="col-auto">
-                  <button type="button" id="save_time_lunchout2" class="btn btn-warning px-3">Lunch In</button>
+                  <button type="button" id="save_time_lunchin2" class="btn btn-warning px-3">Lunch In</button>
                 </div>
 
                 <div class="col-auto">
-                  <button type="button" id="save_time_lunchin2" class="btn btn-danger px-3">Lunch Out</button>
+                  <button type="button" id="save_time_lunchout2" class="btn btn-danger px-3">Lunch Out</button>
                 </div>
 
                 <div class="col-auto">
