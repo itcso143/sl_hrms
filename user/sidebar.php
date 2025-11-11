@@ -733,7 +733,7 @@ FROM tbl_employee_timelogs t ORDER BY t.id DESC LIMIT 1;";
       hour: '2-digit',
       minute: '2-digit',
       second: '2-digit',
-      hour12: false // force 24-hour format
+      hour12: true // ✅ 12-hour format with AM/PM
     };
     document.getElementById("liveTime").textContent = now.toLocaleTimeString([], options);
   }
@@ -744,6 +744,7 @@ FROM tbl_employee_timelogs t ORDER BY t.id DESC LIMIT 1;";
   // Initialize immediately when modal opens
   document.getElementById('timeInModal').addEventListener('shown.bs.modal', updateLiveTime);
 </script>
+
 <script>
   $(document).ready(function() {
     $('#save_time_in').on('click', function() {
