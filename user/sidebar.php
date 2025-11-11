@@ -16,11 +16,11 @@ $date_logs1 = '';
 
 $logs_id = '';
 
-$logs_id_final ='';
+$logs_id_final = '';
 
-$get_logs_id='';
+$get_logs_id = '';
 
-$emp_id_new2='';
+$emp_id_new2 = '';
 
 include('update_user_activity.php');
 
@@ -59,7 +59,7 @@ while ($result4 = $user_data->fetch(PDO::FETCH_ASSOC)) {
     $get_logs_id = $result4['logs_id'];
   }
 
-   $get_logs_data_sql = "SELECT 
+  $get_logs_data_sql = "SELECT 
     t.emp_id, 
     t.date_logs,
     t.logs_id,
@@ -114,7 +114,7 @@ FROM tbl_employee_timelogs t ORDER BY t.id DESC LIMIT 1;";
     $emp_id_new2 = $result4['emp_id'];
   }
 
-$get_sched_sql = "
+  $get_sched_sql = "
     SELECT logs_id, emp_id, punch_out 
     FROM tbl_employee_timelogs 
     WHERE emp_id = :emp_id 
@@ -122,19 +122,19 @@ $get_sched_sql = "
     LIMIT 1
 ";
 
-$get_sched_data = $con->prepare($get_sched_sql);
-$get_sched_data->execute([
+  $get_sched_data = $con->prepare($get_sched_sql);
+  $get_sched_data->execute([
     ':emp_id'  => $emp_id_new2,
     ':logs_id' => $logs_id_new
-]);
+  ]);
 
-$result4 = $get_sched_data->fetch(PDO::FETCH_ASSOC);
+  $result4 = $get_sched_data->fetch(PDO::FETCH_ASSOC);
 
-if ($result4) {
+  if ($result4) {
     $logs_id_final = $result4['logs_id'];
-} else {
+  } else {
     $logs_id_final = null; // explicitly set to null if no result found
-}
+  }
 
   $date_logs1 = date('Y-m-d');
 
@@ -313,10 +313,13 @@ if ($result4) {
       ?>
 
 
+      <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#timeInModal">
+        Attendance
+      </button>
 
 
 
- <!-- FLOATING MODAL -->
+      <!-- FLOATING MODAL -->
       <div class="modal floating-modal" id="timeInModal" tabindex="-1" aria-labelledby="timeInModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-lg">
           <div class="modal-content">
@@ -324,7 +327,7 @@ if ($result4) {
             <!-- MODAL HEADER -->
             <div class="modal-header draggable">
               <h5 class="modal-title" id="timeInModalLabel">Attendance</h5>
-                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
               <div>
                 <!-- Minimize Button -->
                 <!-- <button type="button" class="btn btn-secondary btn-sm me-2" id="minimizeModal" title="Minimize">–</button> -->
@@ -614,7 +617,7 @@ if ($result4) {
 
 
 
-  <li class="nav-item has-treeview">
+      <li class="nav-item has-treeview">
         <a href="#" class="nav-link">
           <i class="nav-icon fa fa-exchange"></i>
           <p>
