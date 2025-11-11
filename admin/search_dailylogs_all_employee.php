@@ -32,8 +32,9 @@ $sql = "SELECT
             t.date_logs,
             t.schedule_code,
             t.emp_id,
-            t.punch_in,
-            t.punch_out,
+           MIN(t.punch_in) AS punch_in,
+        MAX(t.punch_out) AS punch_out,
+   
             t.late,
             t.work_hours,
             t.overtime_in,
