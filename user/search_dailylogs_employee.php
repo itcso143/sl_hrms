@@ -1,8 +1,8 @@
 <?php
 include('../config/db_config.php');
 session_start();
+
 $columns = array(
-    // datatable column index  => database column name
     0 =>  'date_logs',
     1 => 'emp_id',
     2 => 'fullname',
@@ -10,60 +10,41 @@ $columns = array(
     4 => 'time_out',
     5 => 'ot_time_in',
     6 => 'ot_time_out'
-
 );
 
 $user_id = $_SESSION['id'];
-$get_user_sql = "SELECT * FROM tbl_users where id = :id ";
+$get_user_sql = "SELECT * FROM tbl_users WHERE id = :id";
 $user_data = $con->prepare($get_user_sql);
 $user_data->execute([':id' => $user_id]);
-while ($result = $user_data->fetch(PDO::FETCH_ASSOC)) {
 
+$result = $user_data->fetch(PDO::FETCH_ASSOC);
+$emp_id = $result['emp_id'];
 
-    $emp_id = $result['emp_id'];
-}
-
-// storing  request (ie, get/post) global array to a variable  
+// store request
 $requestData = $_REQUEST;
 
-
-$get_employee_sql = "SELECT date_logs,punch_in,punch_out,break_in,break_out,lunch_in,lunch_out,late FROM tbl_employee_timelogs  WHERE emp_id = '$emp_id'  order by id DESC";
-
+$get_employee_sql = "SELECT date_logs,punch_in,punch_out,break_in,break_out,lunch_in,lunch_out,late 
+                     FROM tbl_employee_timelogs 
+                     WHERE emp_id = :emp_id 
+                     ORDER BY id DESC";
 $getIndividualData = $con->prepare($get_employee_sql);
-$getIndividualData->execute();
+$getIndividualData->execute([':emp_id' => $emp_id]);
 
-$countNoFilter = "SELECT COUNT(id) as id from tbl_employee_info";
+$countNoFilter = "SELECT COUNT(id) AS id FROM tbl_employee_info";
 $getrecordstmt = $con->prepare($countNoFilter);
 $getrecordstmt->execute() or die("search_dailylogs_employee.php");
 $getrecord = $getrecordstmt->fetch(PDO::FETCH_ASSOC);
 $totalData = $getrecord['id'];
-
 $totalFiltered = $totalData;
-// when there is no search parameter then total number rows = total number filtered rows.
 
-
-$getAllIndividual = "SELECT emp_id,date_logs FROM tbl_employee_timelogs where";
-
-if (!empty($requestData['search']['value'])) {
-    $getAllIndividual .= " (emp_id LIKE '%" . $requestData['search']['value'] . "%'";
-    $getAllIndividual .= " OR date_logs LIKE '%" . $requestData['search']['value'] . "%') ";
-
-    $getAllIndividual .= " ORDER BY t.id DESC";
-    $getIndividualData = $con->prepare($getAllIndividual);
-    $getIndividualData->execute();
-
-
-
-    $countfilter = "SELECT emp_id,date_logs FROM tbl_employee_timelogs where ";
-    $countfilter .= " (emp_id LIKE '%" . $requestData['search']['value'] . "%'";
-    $countfilter .= " OR date_logs LIKE '%" . $requestData['search']['value'] . "%') ";
-    $countfilter .= "LIMIT 20";
-
-    $getrecordstmt = $con->prepare($countfilter);
-    $getrecordstmt->execute() or die("search_dailylogs_employee.php");
-    $getrecord1 = $getrecordstmt->fetch(PDO::FETCH_ASSOC);
-    $totalData = $getrecord['id'];
-    $totalFiltered = $totalData;
+// === Helper function to format time ===
+function formatTime($time)
+{
+    // Replace '00:00:00' or empty values with your preferred default
+    if ($time == "00:00:00" || empty($time)) {
+        return "";
+    }
+    return date("h:i A", strtotime($time));
 }
 
 $data = array();
@@ -71,28 +52,23 @@ $data = array();
 while ($row = $getIndividualData->fetch(PDO::FETCH_ASSOC)) {
     $nestedData = array();
     $nestedData[] = $row["date_logs"];
-    $nestedData[] = $row["punch_in"];
-    $nestedData[] = $row["punch_out"];
-    $nestedData[] = $row["break_in"];
-    $nestedData[] = $row["break_out"];
-    $nestedData[] = $row["lunch_in"];
-    $nestedData[] = $row["lunch_out"];
-
+    $nestedData[] = formatTime($row["punch_in"]);
+    $nestedData[] = formatTime($row["punch_out"]);
+    $nestedData[] = formatTime($row["break_in"]);
+    $nestedData[] = formatTime($row["break_out"]);
+    $nestedData[] = formatTime($row["lunch_in"]);
+    $nestedData[] = formatTime($row["lunch_out"]);
     $nestedData[] = '<span style="color:red;">' . $row["late"] . '</span>';
 
-
-
-
-
-
-    // $nestedData[] = ucwords(strtolower($row["fullname"]));
     $data[] = $nestedData;
 }
+
 $json_data = array(
-    "draw"            => intval($requestData['draw']),   // for every request/draw by clientside , they send a number as a parameter, when they recieve a response/data they first check the draw number, so we are sending same number in draw. 
-    "recordsTotal"    => intval($totalData),  // total number of records
-    "recordsFiltered" => intval($totalFiltered), // total number of records after searching, if there is no searching then totalFiltered = totalData
-    "data"            => $data   // total data array
+    "draw"            => intval($requestData['draw']),
+    "recordsTotal"    => intval($totalData),
+    "recordsFiltered" => intval($totalFiltered),
+    "data"            => $data
 );
 
-echo json_encode($json_data);  // send data as json format
+echo json_encode($json_data);
+?>
