@@ -28,7 +28,18 @@ while ($result = $user_data->fetch(PDO::FETCH_ASSOC)) {
 $requestData = $_REQUEST;
 
 
-$get_employee_sql = "SELECT t.date_logs,t.schedule_code,t.emp_id,t.punch_in,t.punch_out,t.late,t.work_hours,t.overtime_in,t.overtime_out,r.fullname FROM tbl_employee_timelogs t LEFT JOIN tbl_employee_info r on r.emp_id=t.emp_id  WHERE t.emp_id = '$emp_id' order by t.id DESC";
+$get_employee_sql = "SELECT 
+        emp_id,
+        schedule_code,
+        date_logs,
+        late,
+        MIN(punch_in) AS punch_in,
+        MAX(punch_out) AS punch_out,
+        MIN(break_in) AS break_in,
+        MAX(break_out) AS break_out,
+        MIN(lunch_in) AS lunch_in,
+        MAX(lunch_out) AS lunch_out
+ FROM tbl_employee_timelogs WHERE emp_id = '$emp_id' order by id DESC";
 
 $getIndividualData = $con->prepare($get_employee_sql);
 $getIndividualData->execute();
@@ -72,15 +83,14 @@ $data = array();
 while ($row = $getIndividualData->fetch(PDO::FETCH_ASSOC)) {
     $nestedData = array();
     $nestedData[] = $row["emp_id"];
-    $nestedData[] = strtoupper($row["fullname"]);
+   
     $nestedData[] = strtoupper($row["schedule_code"]);
     $nestedData[] = $row["date_logs"];
     $nestedData[] = $row["punch_in"];
     $nestedData[] = $row["punch_out"];
    $nestedData[] = '<span style="color:red;">' . $row["late"] . '</span>';
    
-    $nestedData[] = $row["overtime_in"];
-    $nestedData[] = $row["overtime_out"];
+
 
 
 

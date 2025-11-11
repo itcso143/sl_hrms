@@ -92,15 +92,14 @@ while ($result = $user_data->fetch(PDO::FETCH_ASSOC)) {
                     <table style="overflow-x: auto;" id="users" name="user" class="table table-bordered table-striped">
                       <thead align="center">
                         <th> EMP_ID </th>
-                        <th> FULLNAME </th>
+                  
                         <th> SCHEDULE </th>
-                        <th> DATE LOGS </th>
+                        <th> DATE </th>
                         <th> TIME IN </th>
                         <th> TIME OUT </th>
                          <th> LATE </th>
                     
-                        <th> OT-TIME IN </th>
-                        <th> OT-TIME OUT </th>
+                  
 
                      
 
