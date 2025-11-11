@@ -1,20 +1,16 @@
 <?php
-// Sample data for cards
-$cards = [
+$participants = [
     [
-        'title' => 'Card 1',
-        'description' => 'This is the first card.',
-        'image' => 'https://via.placeholder.com/150'
+        'name' => 'User 1',
+        'video' => 'https://www.youtube.com/embed/PGIalZd9WPs?autoplay=1&mute=1' // YouTube embed
     ],
     [
-        'title' => 'Card 2',
-        'description' => 'This is the second card.',
-        'image' => 'https://via.placeholder.com/150'
+        'name' => 'User 2',
+        'video' => 'https://www.facebook.com/live/producer/685814970944377/'
     ],
     [
-        'title' => 'Card 3',
-        'description' => 'This is the third card.',
-        'image' => 'https://via.placeholder.com/150'
+        'name' => 'User 3',
+        'video' => 'https://www.w3schools.com/html/mov_bbb.mp4'
     ],
 ];
 ?>
@@ -22,63 +18,29 @@ $cards = [
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PHP Card Layout</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background: #f4f4f4;
-            display: flex;
-            justify-content: center;
-            padding: 50px;
-        }
-        .card-container {
-            display: flex;
-            gap: 20px;
-            flex-wrap: wrap;
-        }
-        .card {
-            background: #fff;
-            border-radius: 8px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-            width: 250px;
-            overflow: hidden;
-            transition: transform 0.2s;
-        }
-        .card:hover {
-            transform: translateY(-5px);
-        }
-        .card img {
-            width: 100%;
-            height: 150px;
-            object-fit: cover;
-        }
-        .card-body {
-            padding: 15px;
-        }
-        .card-title {
-            font-size: 18px;
-            font-weight: bold;
-            margin-bottom: 10px;
-        }
-        .card-description {
-            font-size: 14px;
-            color: #555;
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Video Chat</title>
+<style>
+    body { font-family: Arial; background: #f4f4f4; display: flex; justify-content: center; padding: 50px; }
+    .video-container { display: flex; gap: 20px; flex-wrap: wrap; }
+    .participant-card { background: #fff; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); width: 250px; overflow: hidden; display: flex; flex-direction: column; align-items: center; padding: 10px; }
+    .participant-name { font-size: 16px; font-weight: bold; margin: 10px 0; }
+    video, iframe { width: 100%; border-radius: 8px; background: black; height: 150px; }
+</style>
 </head>
 <body>
-    <div class="card-container">
-        <?php foreach($cards as $card): ?>
-            <div class="card">
-                <img src="<?php echo $card['image']; ?>" alt="<?php echo $card['title']; ?>">
-                <div class="card-body">
-                    <div class="card-title"><?php echo $card['title']; ?></div>
-                    <div class="card-description"><?php echo $card['description']; ?></div>
-                </div>
-            </div>
-        <?php endforeach; ?>
-    </div>
+<div class="video-container">
+    <?php foreach($participants as $participant): ?>
+        <div class="participant-card">
+            <?php if (strpos($participant['video'], 'youtube.com') !== false): ?>
+                <iframe src="<?php echo $participant['video']; ?>" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+            <?php else: ?>
+                <video src="<?php echo $participant['video']; ?>" controls autoplay muted></video>
+            <?php endif; ?>
+            <div class="participant-name"><?php echo $participant['name']; ?></div>
+        </div>
+    <?php endforeach; ?>
+</div>
 </body>
 </html>
