@@ -1,34 +1,37 @@
 <?php
 include('../config/db_config.php');
 session_start();
-$columns = array(
-    // datatable column index  => database column name
-    0 =>  'date_logs',
-    1 => 'emp_id',
-    2 => 'fullname',
-    3 => 'time_in',
-    4 => 'time_out',
-    5 => 'ot_time_in',
-    6 => 'ot_time_out'
 
-);
-
+// Fetch current user
 $user_id = $_SESSION['id'];
-$get_user_sql = "SELECT * FROM tbl_users where id = :id ";
+$get_user_sql = "SELECT emp_id FROM tbl_users WHERE id = :id";
 $user_data = $con->prepare($get_user_sql);
 $user_data->execute([':id' => $user_id]);
-while ($result = $user_data->fetch(PDO::FETCH_ASSOC)) {
+$user = $user_data->fetch(PDO::FETCH_ASSOC);
+$emp_id = $user['emp_id'] ?? '';
 
-
-  $emp_id = $result['emp_id'];
-
-}
-
-// storing  request (ie, get/post) global array to a variable  
 $requestData = $_REQUEST;
 
+// Define columns
+$columns = [
+    0 => 'date_logs',
+    1 => 'emp_id',
+    2 => 'schedule_code',
+    3 => 'punch_in',
+    4 => 'punch_out',
+    5 => 'late'
+];
 
-$get_employee_sql = "SELECT 
+// COUNT total records
+$sql_count = "SELECT COUNT(*) as total FROM tbl_employee_timelogs WHERE emp_id = :emp_id";
+$stmt = $con->prepare($sql_count);
+$stmt->execute([':emp_id' => $emp_id]);
+$totalData = $stmt->fetch(PDO::FETCH_ASSOC)['total'];
+$totalFiltered = $totalData;
+
+// Base query
+$sql = "
+    SELECT 
         emp_id,
         schedule_code,
         date_logs,
@@ -39,74 +42,71 @@ $get_employee_sql = "SELECT
         MAX(break_out) AS break_out,
         MIN(lunch_in) AS lunch_in,
         MAX(lunch_out) AS lunch_out
- FROM tbl_employee_timelogs WHERE emp_id = '$emp_id' order by id DESC";
+    FROM tbl_employee_timelogs
+    WHERE emp_id = :emp_id
+";
 
-$getIndividualData = $con->prepare($get_employee_sql);
-$getIndividualData->execute();
-
-$countNoFilter = "SELECT COUNT(id) as id from tbl_employee_info";
-$getrecordstmt = $con->prepare($countNoFilter);
-$getrecordstmt->execute() or die("search_dailylogs_employee.php");
-$getrecord = $getrecordstmt->fetch(PDO::FETCH_ASSOC);
-$totalData = $getrecord['id'];
-
-$totalFiltered = $totalData;
-// when there is no search parameter then total number rows = total number filtered rows.
-
-
-$getAllIndividual = "SELECT emp_id,date_logs FROM tbl_employee_timelogs where";
-
-if (!empty($requestData['search']['value'])) {
-    $getAllIndividual .= " (emp_id LIKE '%" . $requestData['search']['value'] . "%'";
-    $getAllIndividual .= " OR date_logs LIKE '%" . $requestData['search']['value'] . "%') ";
-
-    $getAllIndividual .= " ORDER BY t.id DESC";
-    $getIndividualData = $con->prepare($getAllIndividual);
-    $getIndividualData->execute();
-
-
-
-    $countfilter = "SELECT emp_id,date_logs FROM tbl_employee_timelogs where ";
-    $countfilter .= " (emp_id LIKE '%" . $requestData['search']['value'] . "%'";
-    $countfilter .= " OR date_logs LIKE '%" . $requestData['search']['value'] . "%') ";
-    $countfilter .= "LIMIT 20";
-
-    $getrecordstmt = $con->prepare($countfilter);
-    $getrecordstmt->execute() or die("search_dailylogs_employee.php");
-    $getrecord1 = $getrecordstmt->fetch(PDO::FETCH_ASSOC);
-    $totalData = $getrecord['id'];
-    $totalFiltered = $totalData;
+// Apply search if exists
+$search = trim($requestData['search']['value'] ?? '');
+if (!empty($search)) {
+    $sql .= " AND (emp_id LIKE :search OR date_logs LIKE :search)";
 }
 
-$data = array();
+// Grouping
+$sql .= " GROUP BY date_logs, emp_id, schedule_code, late";
 
-while ($row = $getIndividualData->fetch(PDO::FETCH_ASSOC)) {
-    $nestedData = array();
+// Ordering
+$orderColumn = $columns[$requestData['order'][0]['column']] ?? 'date_logs';
+$orderDir = $requestData['order'][0]['dir'] ?? 'DESC';
+$sql .= " ORDER BY $orderColumn $orderDir";
+
+// Pagination
+$start = intval($requestData['start'] ?? 0);
+$length = intval($requestData['length'] ?? 10);
+$sql .= " LIMIT :start, :length";
+
+$stmt = $con->prepare($sql);
+
+// Bind parameters
+$stmt->bindValue(':emp_id', $emp_id, PDO::PARAM_STR);
+if (!empty($search)) {
+    $stmt->bindValue(':search', "%$search%", PDO::PARAM_STR);
+}
+$stmt->bindValue(':start', $start, PDO::PARAM_INT);
+$stmt->bindValue(':length', $length, PDO::PARAM_INT);
+$stmt->execute();
+
+$data = [];
+while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+    $nestedData = [];
     $nestedData[] = $row["emp_id"];
-   
     $nestedData[] = strtoupper($row["schedule_code"]);
     $nestedData[] = $row["date_logs"];
     $nestedData[] = $row["punch_in"];
     $nestedData[] = $row["punch_out"];
-   $nestedData[] = '<span style="color:red;">' . $row["late"] . '</span>';
-   
-
-
-
-
-
-
-    // $nestedData[] = ucwords(strtolower($row["fullname"]));
+    $nestedData[] = '<span style="color:red;">' . $row["late"] . '</span>';
     $data[] = $nestedData;
 }
-$json_data = array(
-    "draw"            => intval($requestData['draw']),   // for every request/draw by clientside , they send a number as a parameter, when they recieve a response/data they first check the draw number, so we are sending same number in draw. 
-    "recordsTotal"    => intval($totalData),  // total number of records
-    "recordsFiltered" => intval($totalFiltered), // total number of records after searching, if there is no searching then totalFiltered = totalData
-    "data"            => $data   // total data array
-);
 
-echo json_encode($json_data);  // send data as json format
+// Total filtered count (if search applied)
+if (!empty($search)) {
+    $count_sql = "
+        SELECT COUNT(DISTINCT date_logs) as total
+        FROM tbl_employee_timelogs
+        WHERE emp_id = :emp_id AND (emp_id LIKE :search OR date_logs LIKE :search)
+    ";
+    $count_stmt = $con->prepare($count_sql);
+    $count_stmt->execute([':emp_id' => $emp_id, ':search' => "%$search%"]);
+    $totalFiltered = $count_stmt->fetch(PDO::FETCH_ASSOC)['total'];
+}
 
+// Final JSON response
+$json_data = [
+    "draw"            => intval($requestData['draw']),
+    "recordsTotal"    => intval($totalData),
+    "recordsFiltered" => intval($totalFiltered),
+    "data"            => $data
+];
 
-
+echo json_encode($json_data);
+?>
