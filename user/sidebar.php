@@ -316,25 +316,20 @@ if ($result4) {
 
 
 
-
-
-
-
-
-
-      <!-- FLOATING MODAL -->
-      <div class="modal floating-modal show" id="timeInModal" tabindex="-1" aria-labelledby="timeInModalLabel" aria-hidden="false" style="display:block;">
+ <!-- FLOATING MODAL -->
+      <div class="modal floating-modal" id="timeInModal" tabindex="-1" aria-labelledby="timeInModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-lg">
           <div class="modal-content">
 
             <!-- MODAL HEADER -->
             <div class="modal-header draggable">
               <h5 class="modal-title" id="timeInModalLabel">Attendance</h5>
+                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
               <div>
                 <!-- Minimize Button -->
-                <button type="button" class="btn btn-secondary btn-sm me-2" id="minimizeModal" title="Minimize">–</button>
+                <!-- <button type="button" class="btn btn-secondary btn-sm me-2" id="minimizeModal" title="Minimize">–</button> -->
                 <!-- Maximize Button -->
-                <button type="button" class="btn btn-secondary btn-sm me-2" id="maximizeModal" title="Maximize">⬜</button>
+                <!-- <button type="button" class="btn btn-secondary btn-sm me-2" id="maximizeModal" title="Maximize">⬜</button> -->
 
               </div>
             </div>
@@ -371,14 +366,14 @@ if ($result4) {
                 <div class="col-auto">
                   <button type="button" id="save_time_breakout2" class="btn btn-warning px-3">Break In</button>
                 </div>
-                
+
                 <div class="col-auto">
                   <button type="button" id="save_time_breakin2" class="btn btn-danger px-3">Break Out</button>
                 </div>
                 <div class="col-auto">
                   <button type="button" id="save_time_lunchout2" class="btn btn-warning px-3">Lunch In</button>
                 </div>
-                
+
                 <div class="col-auto">
                   <button type="button" id="save_time_lunchin2" class="btn btn-danger px-3">Lunch Out</button>
                 </div>

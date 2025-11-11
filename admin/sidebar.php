@@ -16,11 +16,11 @@ $date_logs1 = '';
 
 $logs_id = '';
 
-$logs_id_final ='';
+$logs_id_final = '';
 
-$get_logs_id='';
+$get_logs_id = '';
 
-$emp_id_new2='';
+$emp_id_new2 = '';
 
 include('update_user_activity.php');
 
@@ -59,7 +59,7 @@ while ($result4 = $user_data->fetch(PDO::FETCH_ASSOC)) {
     $get_logs_id = $result4['logs_id'];
   }
 
-   $get_logs_data_sql = "SELECT 
+  $get_logs_data_sql = "SELECT 
     t.emp_id, 
     t.date_logs,
     t.logs_id,
@@ -114,7 +114,7 @@ FROM tbl_employee_timelogs t ORDER BY t.id DESC LIMIT 1;";
     $emp_id_new2 = $result4['emp_id'];
   }
 
-$get_sched_sql = "
+  $get_sched_sql = "
     SELECT logs_id, emp_id, punch_out 
     FROM tbl_employee_timelogs 
     WHERE emp_id = :emp_id 
@@ -122,19 +122,19 @@ $get_sched_sql = "
     LIMIT 1
 ";
 
-$get_sched_data = $con->prepare($get_sched_sql);
-$get_sched_data->execute([
+  $get_sched_data = $con->prepare($get_sched_sql);
+  $get_sched_data->execute([
     ':emp_id'  => $emp_id_new2,
     ':logs_id' => $logs_id_new
-]);
+  ]);
 
-$result4 = $get_sched_data->fetch(PDO::FETCH_ASSOC);
+  $result4 = $get_sched_data->fetch(PDO::FETCH_ASSOC);
 
-if ($result4) {
+  if ($result4) {
     $logs_id_final = $result4['logs_id'];
-} else {
+  } else {
     $logs_id_final = null; // explicitly set to null if no result found
-}
+  }
 
   $date_logs1 = date('Y-m-d');
 
@@ -315,7 +315,9 @@ if ($result4) {
 
 
 
-
+      <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#timeInModal">
+      Attendance
+      </button>
 
 
 
@@ -323,18 +325,19 @@ if ($result4) {
 
 
       <!-- FLOATING MODAL -->
-      <div class="modal floating-modal show" id="timeInModal" tabindex="-1" aria-labelledby="timeInModalLabel" aria-hidden="false" style="display:block;">
+      <div class="modal floating-modal" id="timeInModal" tabindex="-1" aria-labelledby="timeInModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-lg">
           <div class="modal-content">
 
             <!-- MODAL HEADER -->
             <div class="modal-header draggable">
               <h5 class="modal-title" id="timeInModalLabel">Attendance</h5>
+                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
               <div>
                 <!-- Minimize Button -->
-                <button type="button" class="btn btn-secondary btn-sm me-2" id="minimizeModal" title="Minimize">–</button>
+                <!-- <button type="button" class="btn btn-secondary btn-sm me-2" id="minimizeModal" title="Minimize">–</button> -->
                 <!-- Maximize Button -->
-                <button type="button" class="btn btn-secondary btn-sm me-2" id="maximizeModal" title="Maximize">⬜</button>
+                <!-- <button type="button" class="btn btn-secondary btn-sm me-2" id="maximizeModal" title="Maximize">⬜</button> -->
 
               </div>
             </div>
@@ -371,14 +374,14 @@ if ($result4) {
                 <div class="col-auto">
                   <button type="button" id="save_time_breakout2" class="btn btn-warning px-3">Break In</button>
                 </div>
-                
+
                 <div class="col-auto">
                   <button type="button" id="save_time_breakin2" class="btn btn-danger px-3">Break Out</button>
                 </div>
                 <div class="col-auto">
                   <button type="button" id="save_time_lunchout2" class="btn btn-warning px-3">Lunch In</button>
                 </div>
-                
+
                 <div class="col-auto">
                   <button type="button" id="save_time_lunchin2" class="btn btn-danger px-3">Lunch Out</button>
                 </div>
@@ -394,11 +397,11 @@ if ($result4) {
       </div>
 
       <!-- MINIMIZED BUTTON -->
-      <button id="minimizedBtn" class="btn btn-primary floating-minimized-btn" style="display:none;">Daily Logs</button>
+      <!-- <button id="minimizedBtn" class="btn btn-primary floating-minimized-btn" style="display:none;">Daily Logs</button> -->
 
 
       <!-- MINIMIZED BUTTON -->
-      <button id="minimizedBtn" class="btn btn-primary floating-minimized-btn" style="display:none;">Daily Logs</button>
+      <!-- <button id="minimizedBtn" class="btn btn-primary floating-minimized-btn" style="display:none;">Daily Logs</button> -->
 
 
 
