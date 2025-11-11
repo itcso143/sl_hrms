@@ -93,11 +93,11 @@ while ($result = $user_data->fetch(PDO::FETCH_ASSOC)) {
                       <thead align="center">
                         <th> EMP_ID </th>
                   
-                        <th> SCHEDULE </th>
-                        <th> DATE </th>
-                        <th> TIME IN </th>
-                        <th> TIME OUT </th>
-                         <th> LATE </th>
+                        <th>SCHEDULE </th>
+                        <th>DATE </th>
+                        <th>TIME IN </th>
+                        <th>TIME OUT </th>
+                         <th>LATE </th>
                     
                   
 
