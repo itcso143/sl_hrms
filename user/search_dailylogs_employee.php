@@ -28,7 +28,10 @@ while ($result = $user_data->fetch(PDO::FETCH_ASSOC)) {
 $requestData = $_REQUEST;
 
 
-$get_employee_sql = "SELECT t.date_logs,t.schedule_code,t.emp_id,t.punch_in,t.punch_out,t.late,t.work_hours,t.overtime_in,t.overtime_out,r.fullname FROM tbl_employee_timelogs t LEFT JOIN tbl_employee_info r on r.emp_id=t.emp_id  WHERE t.emp_id = '$emp_id' and punch_in !='' or punch_out !='' order by t.id DESC";
+$get_employee_sql = "SELECT t.date_logs,t.schedule_code,t.emp_id,
+(SELECT punch_in FROM tbl_employee_timelogs WHERE emp_id='$emp_id' AND punch_in !='' LIMIT 1) AS punch_in,
+(SELECT punch_out FROM tbl_employee_timelogs WHERE emp_id='$emp_id' AND punch_out !='' LIMIT 1) AS punch_out,
+t.late,t.work_hours,t.overtime_in,t.overtime_out,r.fullname FROM tbl_employee_timelogs t LEFT JOIN tbl_employee_info r ON r.emp_id=t.emp_id  WHERE t.emp_id = 'EMP-3445'  ORDER BY t.id DESC";
 
 $getIndividualData = $con->prepare($get_employee_sql);
 $getIndividualData->execute();
