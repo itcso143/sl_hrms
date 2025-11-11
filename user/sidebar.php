@@ -21,6 +21,7 @@ $logs_id_final = '';
 $get_logs_id = '';
 
 $emp_id_new2 = '';
+$logs_id_new ='';
 
 include('update_user_activity.php');
 

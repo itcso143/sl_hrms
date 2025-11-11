@@ -83,18 +83,17 @@ while ($result = $user_data->fetch(PDO::FETCH_ASSOC)) {
 
                     <table style="overflow-x: auto;" id="users" name="user" class="table table-bordered table-striped">
                       <thead align="center">
-                        <th> EMP_ID </th>
+                        <th> DATE </th>
                         <th> FULLNAME </th>
-                        <th> SCHEDULE </th>
-                        <th> DATE LOGS </th>
-                        <th> TIME IN </th>
-                        <th> TIME OUT </th>
-                         <th> LATE </th>
-                   
-                        <th> OT-TIME IN </th>
-                        <th> OT-TIME OUT </th>
+                        <th>TIME IN </th>
+                        <th>TIME OUT </th>
+                        <th>BREAK IN </th>
+                        <th>BREAK OUT </th>
+                        <th>LUNCH IN </th>
+                        <th>LUNCH OUT </th>
+                        <th>LATE</th>
 
-                     
+
 
                       </thead>
                       <tbody>
@@ -304,7 +303,7 @@ while ($result = $user_data->fetch(PDO::FETCH_ASSOC)) {
           );
         }
       },
- 
+
 
       // <div class="dropdown">
       //   <button class="btn btn-sm btn-primary dropdown-toggle" type="button" 
@@ -312,7 +311,7 @@ while ($result = $user_data->fetch(PDO::FETCH_ASSOC)) {
       //     Actions
       //   </button>
       //   <ul class="dropdown-menu" aria-labelledby="actionMenuButton">
-         
+
       //       <li>
       //       <a class="dropdown-item editIndividual" id="view_profile" href="#" title="View Profile">
       //         <i class="fa fa-folder"></i> View Profile
@@ -330,7 +329,7 @@ while ($result = $user_data->fetch(PDO::FETCH_ASSOC)) {
       //     </li>
       //   </ul>
       // </div>
-     
+
 
     });
 

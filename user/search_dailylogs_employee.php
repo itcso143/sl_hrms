@@ -23,10 +23,10 @@ $emp_id = $result['emp_id'];
 // store request
 $requestData = $_REQUEST;
 
-$get_employee_sql = "SELECT date_logs,punch_in,punch_out,break_in,break_out,lunch_in,lunch_out,late 
-                     FROM tbl_employee_timelogs 
-                     WHERE emp_id = :emp_id 
-                     ORDER BY id DESC";
+$get_employee_sql = "SELECT t.date_logs,t.punch_in,t.punch_out,t.break_in,t.break_out,t.lunch_in,t.lunch_out,t.late,r.fullname 
+                     FROM tbl_employee_timelogs t LEFT JOIN tbl_employee_info r ON r.emp_id = t.emp_id
+                     WHERE t.emp_id = :emp_id 
+                     ORDER BY t.id DESC";
 $getIndividualData = $con->prepare($get_employee_sql);
 $getIndividualData->execute([':emp_id' => $emp_id]);
 
@@ -52,6 +52,7 @@ $data = array();
 while ($row = $getIndividualData->fetch(PDO::FETCH_ASSOC)) {
     $nestedData = array();
     $nestedData[] = $row["date_logs"];
+     $nestedData[] = $row["fullname"];
     $nestedData[] = formatTime($row["punch_in"]);
     $nestedData[] = formatTime($row["punch_out"]);
     $nestedData[] = formatTime($row["break_in"]);
