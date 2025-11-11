@@ -2,12 +2,15 @@
 include('../config/db_config.php');
 
 date_default_timezone_set('Asia/Manila');
-$date = date('Y-m-d');
 
-
-// ✅ Simplified and fixed SQL
-$yesterday = date('Y-m-d', strtotime('-1 day'));
 $today = date('Y-m-d');
+$yesterday = date('Y-m-d', strtotime('-1 day'));
+
+// ✅ Define the function ONCE (before the loop)
+function formatTime($time) {
+    if (empty($time) || $time == '00:00:00') return '';
+    return date('g:i A', strtotime($time));
+}
 
 $sql = "
 SELECT 
@@ -56,8 +59,6 @@ $stmt = $con->prepare($sql);
 $stmt->bindParam(':today', $today);
 $stmt->bindParam(':yesterday', $yesterday);
 $stmt->execute();
-
-
 ?>
 
 <!-- ✅ HTML Table -->
@@ -77,17 +78,26 @@ $stmt->execute();
   </tr>
 
   <?php while ($row = $stmt->fetch(PDO::FETCH_ASSOC)): ?>
+    <?php
+      // Apply formatting using the function declared above
+      $punch_in  = formatTime($row['punch_in']);
+      $punch_out = formatTime($row['punch_out']);
+      $break_in  = formatTime($row['break_in']);
+      $break_out = formatTime($row['break_out']);
+      $lunch_in  = formatTime($row['lunch_in']);
+      $lunch_out = formatTime($row['lunch_out']);
+    ?>
     <tr>
       <td><?= htmlspecialchars($row['emp_id']) ?></td>
       <td><?= htmlspecialchars($row['fullname']) ?></td>
       <td><?= htmlspecialchars($row['user_type']) ?></td>
       <td><?= htmlspecialchars($row['last_activity']) ?></td>
-      <td><?= htmlspecialchars($row['punch_in']) ?></td>
-      <td><?= htmlspecialchars($row['punch_out']) ?></td>
-      <td><?= htmlspecialchars($row['break_in']) ?></td>
-      <td><?= htmlspecialchars($row['break_out']) ?></td>
-      <td><?= htmlspecialchars($row['lunch_in']) ?></td>
-      <td><?= htmlspecialchars($row['lunch_out']) ?></td>
+      <td><?= $punch_in ?></td>
+      <td><?= $punch_out ?></td>
+      <td><?= $break_in ?></td>
+      <td><?= $break_out ?></td>
+      <td><?= $lunch_in ?></td>
+      <td><?= $lunch_out ?></td>
       <td style="color: <?= $row['current_status'] === 'online' ? 'green' : 'red' ?>;">
         <?= ucfirst($row['current_status']) ?>
       </td>
