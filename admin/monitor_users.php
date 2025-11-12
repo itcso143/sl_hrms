@@ -6,7 +6,7 @@ date_default_timezone_set('Asia/Manila');
 $today = date('Y-m-d');
 $yesterday = date('Y-m-d', strtotime('-1 day'));
 
-// ✅ Define the function ONCE (before the loop)
+// Format time helper function
 function formatTime($time) {
     if (empty($time) || $time == '00:00:00') return '';
     return date('g:i A', strtotime($time));
@@ -26,6 +26,8 @@ SELECT
     t.break_out,
     t.lunch_in,
     t.lunch_out,
+    t.schedule_code,
+    t.date_logs,
     IF(r.last_activity IS NULL, 'offline',
        IF(TIMESTAMPDIFF(SECOND, r.last_activity, NOW()) <= 300, 'online', 'offline')
     ) AS current_status
@@ -39,15 +41,18 @@ LEFT JOIN (
         MIN(break_in) AS break_in,
         MAX(break_out) AS break_out,
         MIN(lunch_in) AS lunch_in,
-        MAX(lunch_out) AS lunch_out
+        MAX(lunch_out) AS lunch_out,
+        -- Add schedule_code if needed, else null
+        MAX(schedule_code) AS schedule_code,
+        MAX(date_logs) AS date_logs
     FROM (
-        SELECT emp_id, punch_in, punch_out, break_in, break_out, lunch_in, lunch_out, date_logs
+        SELECT emp_id, punch_in, punch_out, break_in, break_out, lunch_in, lunch_out, schedule_code, date_logs
         FROM tbl_employee_timelogs
         WHERE DATE(date_logs) = :today
 
         UNION ALL
 
-        SELECT emp_id, punch_in, punch_out, break_in, break_out, lunch_in, lunch_out, date_logs
+        SELECT emp_id, punch_in, punch_out, break_in, break_out, lunch_in, lunch_out, schedule_code, date_logs
         FROM tbl_employee_timelogs
         WHERE DATE(date_logs) = :yesterday AND TIME(punch_in) >= '21:00:00'
     ) combined
@@ -61,13 +66,14 @@ $stmt->bindParam(':yesterday', $yesterday);
 $stmt->execute();
 ?>
 
-<!-- ✅ HTML Table -->
 <table border="1" cellpadding="5" style="margin: 0 auto; border-collapse: collapse; text-align: center;">
-  <tr>
+  <tr style="background-color: #f0f0f0;">
     <th style="width: 6%;">Emp ID</th>
     <th style="width: 25%;">Name</th>
-    <th style="width: 7%;">User Type</th>
-    <th style="width: 13%;">Last Activity</th>
+    <th style="width: 6%;">User Type</th>
+    <th style="width: 11%;">Last Activity</th>
+    <th style="width: 6%;">Date Logs</th>
+    <th style="width: 4%;">Sched Code</th>
     <th style="background-color: blue; color: white; width: 7%;">Time In</th>
     <th style="background-color: darkred; color: white; width: 7%;">Time Out</th>
     <th style="background-color: blue; color: white; width: 7%;">Break In</th>
@@ -79,7 +85,6 @@ $stmt->execute();
 
   <?php while ($row = $stmt->fetch(PDO::FETCH_ASSOC)): ?>
     <?php
-      // Apply formatting using the function declared above
       $punch_in  = formatTime($row['punch_in']);
       $punch_out = formatTime($row['punch_out']);
       $break_in  = formatTime($row['break_in']);
@@ -92,6 +97,8 @@ $stmt->execute();
       <td><?= htmlspecialchars($row['fullname']) ?></td>
       <td><?= htmlspecialchars($row['user_type']) ?></td>
       <td><?= htmlspecialchars($row['last_activity']) ?></td>
+        <td><?= htmlspecialchars($row['date_logs']) ?></td>
+      <td><?= htmlspecialchars($row['schedule_code']) ?></td>
       <td><?= $punch_in ?></td>
       <td><?= $punch_out ?></td>
       <td><?= $break_in ?></td>

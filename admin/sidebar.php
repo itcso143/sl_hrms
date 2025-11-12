@@ -51,6 +51,8 @@ while ($result4 = $user_data->fetch(PDO::FETCH_ASSOC)) {
     $date_range = $result4['description'];
   }
 
+
+
   $get_logs_data_sql = "SELECT id,logs_id FROM tbl_employee_timelogs WHERE emp_id= :emp_id order by id DESC LIMIT 1";
   $get_logs_data = $con->prepare($get_logs_data_sql);
   $get_logs_data->execute([':emp_id' => $emp_id]);
@@ -191,33 +193,18 @@ FROM tbl_employee_timelogs t ORDER BY t.id DESC LIMIT 1;";
     $lunch_in = null;
   }
 
-  // TIME OUT
 
-  //   $get_user_logs_sql = "
-  //     SELECT emp_id, date_logs, punch_in, punch_out 
-  //     FROM tbl_employee_timelogs 
-  //     WHERE emp_id = :emp_id 
-  //       AND punch_out != '' 
-  //       AND date_logs = :date_logs
-  //     LIMIT 1
-  // ";
 
-  //   $get_user_logs_data = $con->prepare($get_user_logs_sql);
-  //   $get_user_logs_data->execute([
-  //     ':emp_id' => $emp_id,
-  //     ':date_logs' => $date_logs1
-  //   ]);
+  // $get_logs_employee_sql = "SELECT emp_id,logs_id,date_logs,
+  // (SELECT break_out FROM tbl_employee_timelogs where emp_id = '$emp_id' and logs_id='$logs_id_new' and break_out !='' limit 1) as break_out2 FROM tbl_employee_timelogs WHERE emp_id= :emp_id and logs_id='$logs_id_new' order by id DESC LIMIT 1";
+  // $get_emp_logs_data = $con->prepare($get_logs_employee_sql);
+  // $get_emp_logs_data->execute([':emp_id' => $emp_id]);
+  // while ($result4 = $get_emp_logs_data->fetch(PDO::FETCH_ASSOC)) {
 
-  //   $result4 = $get_user_logs_data->fetch(PDO::FETCH_ASSOC);
+  //   $get_break_out = $result4['break_out2'];
+  // }
 
-  //   if ($result4) {
-  //     $date_logs1 = $result4['date_logs'];
-  //     $punch_out = $result4['punch_out'];
-  //   } else {
-  //     // No punch-in yet today
-  //     $date_logs1 = null;
-  //     $punch_out = null;
-  //   }
+
 }
 
 
@@ -316,7 +303,7 @@ FROM tbl_employee_timelogs t ORDER BY t.id DESC LIMIT 1;";
 
 
       <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#timeInModal">
-      Attendance
+        Attendance
       </button>
 
 
@@ -332,7 +319,7 @@ FROM tbl_employee_timelogs t ORDER BY t.id DESC LIMIT 1;";
             <!-- MODAL HEADER -->
             <div class="modal-header draggable">
               <h5 class="modal-title" id="timeInModalLabel">Attendance</h5>
-                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
               <div>
                 <!-- Minimize Button -->
                 <!-- <button type="button" class="btn btn-secondary btn-sm me-2" id="minimizeModal" title="Minimize">–</button> -->
@@ -345,6 +332,7 @@ FROM tbl_employee_timelogs t ORDER BY t.id DESC LIMIT 1;";
             <!-- MODAL BODY -->
             <div class="modal-body text-center">
               <p>Click the button to log your time.</p>
+      
               <h4 class="fw-bold mt-3">
                 <!-- PHP Date -->
                 <?php echo date('F j, Y'); ?>
@@ -374,7 +362,6 @@ FROM tbl_employee_timelogs t ORDER BY t.id DESC LIMIT 1;";
                 <div class="col-auto">
                   <button type="button" id="save_time_breakin2" class="btn btn-warning px-3">Break In</button>
                 </div>
-
                 <div class="col-auto">
                   <button type="button" id="save_time_breakout2" class="btn btn-danger px-3">Break Out</button>
                 </div>
