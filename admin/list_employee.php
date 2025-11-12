@@ -531,6 +531,66 @@ $get_emp_netpay_data->execute();
           </div>
 
 
+          <!-- Schedule Modal -->
+          <div class="modal fade" id="modal_livestream" tabindex="-1" aria-labelledby="addlivestreamModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+              <div class="modal-content">
+
+                <!-- Modal Header -->
+                <div class="modal-header bg-primary text-white">
+                  <h5 class="modal-title" id="addLivestreamModalLabel">
+                    <i class="fa fa-calendar"></i> Add Live Stream Link
+                  </h5>
+                  <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+
+                <!-- Modal Body -->
+                <form method="POST" action="update_user_link.php">
+                  <div class="modal-body">
+                    <div class="row">
+                      <div class="col-lg-5">
+                        <label for="emp_id_livestream">EMP ID:</label>
+                        <input readonly type="text" name="emp_id_livestream" id="emp_id_livestream" class="form-control">
+                      </div>
+
+                      <div class="col-lg-5">
+                        <label for="emp_schedule_code">SCHEDULE CODE:</label>
+                        <input readonly type="text" name="emp_schedule_code" id="emp_schedule_code" class="form-control">
+                      </div>
+                    </div>
+
+                    <br>
+
+                    <div class="row">
+                      <div class="col-lg-12">
+                        <label for="fullname_livestream">Name:</label>
+                        <input type="text" name="fullname_livestream" id="fullname_livestream" class="form-control">
+                      </div>
+                    </div>
+                    <br>
+
+                    <div class="row">
+                      <div class="col-lg-12">
+                        <label for="link_livestream">URL:</label>
+                        <input type="text" name="link_livestream" id="link_livestream" class="form-control">
+                      </div>
+                    </div>
+
+                    <br>
+
+
+                  </div>
+
+                  <!-- Modal Footer -->
+                  <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <input type="submit" name="update_user_link" class="btn btn-primary" value="Save">
+                  </div>
+                </form>
+
+              </div>
+            </div>
+          </div>
 
         </div>
 
@@ -742,6 +802,12 @@ $get_emp_netpay_data->execute();
           </a>
           </li>
 
+            <li>
+        <a class="dropdown-item" id="modal_livestream" href="#" title="Add Livestream" data-bs-toggle="modal" data-bs-target="#addLivestreamModal">
+           <i class="fa fa-link"></i> Add Livestream Link
+          </a>
+          </li>
+
         
 
           <li>
@@ -796,6 +862,24 @@ $get_emp_netpay_data->execute();
 
     });
 
+    $(document).ready(function() {
+      $("#users tbody").on("click", "#modal_livestream", function() {
+        event.preventDefault();
+        var currow = $(this).closest("tr");
+        var emp_id = currow.find("td:eq(0)").text();
+        var fullname = currow.find("td:eq(3)").text();
+        var schedule = currow.find("td:eq(2)").text();
+
+        console.log("test");
+        $('#modal_livestream').modal('show');
+        $('#emp_id_livestream').val(emp_id);
+        $('#fullname_livestream').val(fullname);
+        $('#emp_schedule_code').val(schedule);
+
+      });
+
+
+    });
 
     $(document).ready(function() {
       $("#users tbody").on("click", "#modal_schedule", function() {

@@ -1,29 +1,63 @@
 <?php
 // Default videos and names for 30 users
+include('../config/db_config.php');
+
 $default_videos = [];
 $default_names = [];
-for ($i = 1; $i <= 30; $i++) {
-    $default_videos["user_$i"] = '';
-    $default_names["user_{$i}_name"] = "User $i";
+$default_emp_code = [];
+
+// Fetch users from database
+$get_users_link_sql = "SELECT * FROM tbl_livestream_link";
+$get_users_link_data = $con->prepare($get_users_link_sql);
+$get_users_link_data->execute();
+
+// Assign database values to defaults
+$i = 1;
+while ($result = $get_users_link_data->fetch(PDO::FETCH_ASSOC)) {
+    $default_videos["user_$i"] = $result['link_livestream'] ?? '';
+    $default_names["user_{$i}_name"] = $result['fullname_livestream'] ?? "User $i";
+    $default_emp_code["user_{$i}_code"] = $result['emp_schedule_code'] ?? '';
+    $i++;
 }
 
-// Get user inputs (fallback to defaults)
+// ✅ Fill remaining slots up to 30 so indexes always exist
+for (; $i <= 30; $i++) {
+    $default_videos["user_$i"] = '';
+    $default_names["user_{$i}_name"] = "User $i";
+    $default_emp_code["user_{$i}_code"] = '';
+}
+
+// ✅ Initialize $participants before loop
 $participants = [];
+
+// Get user inputs (fallback to defaults)
 for ($i = 1; $i <= 30; $i++) {
     $video_key = "user_$i";
     $name_key = "user_{$i}_name";
+    $code_key = "user_{$i}_code";
 
-    $video = isset($_POST[$video_key]) && !empty($_POST[$video_key]) ? trim($_POST[$video_key]) : $default_videos[$video_key];
-    $name = isset($_POST[$name_key]) && !empty($_POST[$name_key]) ? trim($_POST[$name_key]) : $default_names[$name_key];
+    $video = isset($_POST[$video_key]) && !empty($_POST[$video_key])
+        ? trim($_POST[$video_key])
+        : ($default_videos[$video_key] ?? '');
+
+    $name = isset($_POST[$name_key]) && !empty($_POST[$name_key])
+        ? trim($_POST[$name_key])
+        : ($default_names[$name_key] ?? "User $i");
+
+    $emp_code = isset($_POST[$code_key]) && !empty($_POST[$code_key])
+        ? trim($_POST[$code_key])
+        : ($default_emp_code[$code_key] ?? '');
 
     $participants[] = [
         'name' => htmlspecialchars($name, ENT_QUOTES, 'UTF-8'),
-        'video' => htmlspecialchars($video, ENT_QUOTES, 'UTF-8')
+        'video' => htmlspecialchars($video, ENT_QUOTES, 'UTF-8'),
+        'emp_schedule_code' => htmlspecialchars($emp_code, ENT_QUOTES, 'UTF-8')
     ];
 }
 ?>
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -117,7 +151,8 @@ for ($i = 1; $i <= 30; $i++) {
         .video-wrapper {
             position: relative;
             width: 100%;
-            padding-bottom: 56.25%; /* 16:9 ratio */
+            padding-bottom: 56.25%;
+            /* 16:9 ratio */
             height: 0;
             overflow: hidden;
         }
@@ -150,6 +185,7 @@ for ($i = 1; $i <= 30; $i++) {
         }
     </style>
 </head>
+
 <body>
 
     <h2>Video Chat Embed</h2>
@@ -167,6 +203,7 @@ for ($i = 1; $i <= 30; $i++) {
                 $name_key = "user_{$i}_name";
                 $video_value = $participants[$i - 1]['video'];
                 $name_value = $participants[$i - 1]['name'];
+                $emp_schedule_code = $participants[$i - 1]['name'];
             ?>
                 <div class="row">
                     <div class="col-input">
@@ -174,6 +211,9 @@ for ($i = 1; $i <= 30; $i++) {
                     </div>
                     <div class="col-input">
                         <input type="text" name="<?php echo $name_key; ?>" placeholder="User <?php echo $i; ?> Name" value="<?php echo $name_value; ?>">
+                    </div>
+                    <div class="col-input">
+                        <input type="text" name="user_<?php echo $i; ?>_code" placeholder="Emp Schedule Code" value="<?php echo $participants[$i - 1]['emp_schedule_code']; ?>">
                     </div>
                 </div>
             <?php endfor; ?>
@@ -236,6 +276,9 @@ for ($i = 1; $i <= 30; $i++) {
                     }
                     ?>
                     <div class="participant-name"><?php echo $participant['name']; ?></div>
+                    <?php if (!empty($participant['emp_schedule_code'])): ?>
+                        <div class="participant-code">Schedule Code: <?php echo $participant['emp_schedule_code']; ?></div>
+                    <?php endif; ?>
                 </div>
             <?php endforeach; ?>
         </div>
@@ -261,4 +304,5 @@ for ($i = 1; $i <= 30; $i++) {
     </script>
 
 </body>
+
 </html>
