@@ -24,7 +24,7 @@ if (isset($_POST['time_in'])) {
             $username = strtoupper($result4['username']);
             $emp_id = $result4['emp_id'];
 
-            $get_user_sql = " SELECT emp_id,schedule_code FROM tbl_employee_info where emp_id = :emp_id";
+            $get_user_sql = " SELECT emp_id,schedule_code FROM tbl_employee_info where emp_id = :emp_id AND status='ACTIVE'";
             $user_data = $con->prepare($get_user_sql);
             $user_data->execute([':emp_id' => $emp_id]);
             while ($result4 = $user_data->fetch(PDO::FETCH_ASSOC)) {
