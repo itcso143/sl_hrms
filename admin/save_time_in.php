@@ -14,8 +14,9 @@ if (isset($_POST['time_in'])) {
         $date_logs = '';
         $date_logs1 = '';
         $time = date("i:s");
-        
+
         // //fetch user from database
+          // //fetch user from database
         $get_user_sql = " SELECT username,emp_id FROM tbl_users where id = :id";
         $user_data = $con->prepare($get_user_sql);
         $user_data->execute([':id' => $user_id]);
