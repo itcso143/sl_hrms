@@ -643,6 +643,16 @@ while ($result4 = $user_data->fetch(PDO::FETCH_ASSOC)) {
 
         </ul>
 
+         <ul class="nav nav-treeview">
+          <li class="nav-item">
+            <a href="live_stream" class="nav-link" target="_blank" rel="noopener noreferrer">
+              <i class="fa fa-folder nav-icon"></i>
+              <p>Live Stream</p>
+            </a>
+          </li>
+
+        </ul>
+
 
       </li>
 
