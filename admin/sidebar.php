@@ -21,6 +21,7 @@ $logs_id_final = '';
 $get_logs_id = '';
 
 $emp_id_new2 = '';
+$logs_id_new ='';
 
 include('update_user_activity.php');
 
@@ -61,83 +62,7 @@ while ($result4 = $user_data->fetch(PDO::FETCH_ASSOC)) {
     $get_logs_id = $result4['logs_id'];
   }
 
-  $get_logs_data_sql = "SELECT 
-    t.emp_id, 
-    t.date_logs,
-    t.logs_id,
-    (SELECT punch_in 
-     FROM tbl_employee_timelogs 
-     WHERE emp_id = '$emp_id' 
-	AND logs_id ='$get_logs_id'
-       AND punch_in != '' 
-     ORDER BY date_logs DESC LIMIT 1) AS punch_in,
-     
-        (SELECT punch_out 
-     FROM tbl_employee_timelogs 
-     WHERE emp_id = '$emp_id' 
-     AND logs_id ='$get_logs_id'
-       AND punch_out != '' 
-     ORDER BY date_logs DESC LIMIT 1) AS punch_out,
-     
-      (SELECT break_in 
-     FROM tbl_employee_timelogs 
-     WHERE emp_id = '$emp_id' 
-     AND logs_id ='$get_logs_id'
-       AND break_in != '' 
-     ORDER BY date_logs DESC LIMIT 1) AS break_in,
-     
-     (SELECT break_out 
-     FROM tbl_employee_timelogs 
-     WHERE emp_id = '$emp_id' 
-     AND logs_id ='$get_logs_id'
-       AND break_out != '' 
-     ORDER BY date_logs DESC LIMIT 1) AS break_out,
-     
-     (SELECT lunch_in 
-     FROM tbl_employee_timelogs 
-     WHERE emp_id = '$emp_id' 
-     AND logs_id ='$get_logs_id'
-       AND lunch_in != '' 
-     ORDER BY date_logs DESC LIMIT 1) AS lunch_in,
-     
-      (SELECT lunch_out 
-     FROM tbl_employee_timelogs 
-     WHERE emp_id = :emp_id
-     AND logs_id ='$get_logs_id'
-       AND lunch_out != '' 
-     ORDER BY date_logs DESC LIMIT 1) AS lunch_out
-     
-FROM tbl_employee_timelogs t ORDER BY t.id DESC LIMIT 1;";
-  $get_logs_data = $con->prepare($get_logs_data_sql);
-  $get_logs_data->execute([':emp_id' => $emp_id]);
-  while ($result4 = $get_logs_data->fetch(PDO::FETCH_ASSOC)) {
-
-    $logs_id_new = $result4['logs_id'];
-    $emp_id_new2 = $result4['emp_id'];
-  }
-
-  $get_sched_sql = "
-    SELECT logs_id, emp_id, punch_out 
-    FROM tbl_employee_timelogs 
-    WHERE emp_id = :emp_id 
-      AND logs_id = :logs_id
-    LIMIT 1
-";
-
-  $get_sched_data = $con->prepare($get_sched_sql);
-  $get_sched_data->execute([
-    ':emp_id'  => $emp_id_new2,
-    ':logs_id' => $logs_id_new
-  ]);
-
-  $result4 = $get_sched_data->fetch(PDO::FETCH_ASSOC);
-
-  if ($result4) {
-    $logs_id_final = $result4['logs_id'];
-  } else {
-    $logs_id_final = null; // explicitly set to null if no result found
-  }
-
+ 
   $date_logs1 = date('Y-m-d');
 
   // Prepare SQL to get today's punch-in for this employee
@@ -347,7 +272,7 @@ FROM tbl_employee_timelogs t ORDER BY t.id DESC LIMIT 1;";
                       name="logs_id"
                       class="form-control text-center"
                       placeholder=""
-                      value="<?php echo $logs_id_final; ?>">
+                      value="<?php echo $get_logs_id; ?>">
                   </div>
                 </div>
               </h4>

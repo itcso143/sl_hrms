@@ -57,7 +57,7 @@ LEFT JOIN (
 
         SELECT emp_id, punch_in, punch_out, break_in, break_out, lunch_in, lunch_out, schedule_code, date_logs
         FROM tbl_employee_timelogs
-        WHERE DATE(date_logs) = :yesterday AND TIME(punch_in) >= '21:00:00'
+        WHERE DATE(date_logs) = :yesterday AND TIME(punch_in) >= '23:00:00'
     ) combined
     GROUP BY emp_id
 ) t ON t.emp_id = r.emp_id
