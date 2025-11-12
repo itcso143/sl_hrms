@@ -13,7 +13,8 @@ if (isset($_POST['time_in'])) {
         $photo = '';
         $date_logs = '';
         $date_logs1 = '';
-
+        $time = date("i:s");
+        
         // //fetch user from database
         $get_user_sql = " SELECT username,emp_id FROM tbl_users where id = :id";
         $user_data = $con->prepare($get_user_sql);
@@ -49,7 +50,8 @@ if (isset($_POST['time_in'])) {
             $time_logs_data->execute([
                 ':emp_id'   => $emp_id,
                 ':date_logs'   => $date_logs,
-                ':logs_id'   => $date_logs . '-' . $logs_id,
+                ':logs_id'   => $date_logs . '-' . $logs_id . $time,
+
 
                 ':date_punch_in' => $date_punch_in,
                 ':punch_in' => $time_in,

@@ -1,5 +1,3 @@
-
-
 <?php
 // Default videos and names for 30 users
 $default_videos = [];
@@ -26,7 +24,6 @@ for ($i = 1; $i <= 30; $i++) {
 ?>
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -105,6 +102,7 @@ for ($i = 1; $i <= 30; $i++) {
             display: flex;
             flex-wrap: wrap;
             gap: 20px;
+            justify-content: center;
         }
 
         .participant-card {
@@ -116,10 +114,22 @@ for ($i = 1; $i <= 30; $i++) {
             text-align: center;
         }
 
-        iframe {
+        .video-wrapper {
+            position: relative;
             width: 100%;
-            height: 180px;
+            padding-bottom: 56.25%; /* 16:9 ratio */
+            height: 0;
+            overflow: hidden;
+        }
+
+        .video-wrapper iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
             border-radius: 6px;
+            border: none;
         }
 
         .participant-name {
@@ -140,7 +150,6 @@ for ($i = 1; $i <= 30; $i++) {
         }
     </style>
 </head>
-
 <body>
 
     <h2>Video Chat Embed</h2>
@@ -152,7 +161,7 @@ for ($i = 1; $i <= 30; $i++) {
 
     <div class="tab-content active" id="inputs">
         <form method="POST">
-                  <button type="submit">Update All</button>
+            <button type="submit">Update All</button>
             <?php for ($i = 1; $i <= 30; $i++):
                 $video_key = "user_$i";
                 $name_key = "user_{$i}_name";
@@ -161,14 +170,13 @@ for ($i = 1; $i <= 30; $i++) {
             ?>
                 <div class="row">
                     <div class="col-input">
-                        <input type="text" name="<?php echo $video_key; ?>" placeholder="Enter YouTube/Twitch/Facebook/Teams URL" value="<?php echo $video_value; ?>">
+                        <input type="text" name="<?php echo $video_key; ?>" placeholder="Enter video URL (YouTube, Twitch, Facebook, Teams, CameraFTP...)" value="<?php echo $video_value; ?>">
                     </div>
                     <div class="col-input">
                         <input type="text" name="<?php echo $name_key; ?>" placeholder="User <?php echo $i; ?> Name" value="<?php echo $name_value; ?>">
                     </div>
                 </div>
             <?php endfor; ?>
-      
         </form>
     </div>
 
@@ -187,32 +195,42 @@ for ($i = 1; $i <= 30; $i++) {
                         if (preg_match('/v=([^&]+)/', $url, $m)) $embed_url = "https://www.youtube.com/embed/{$m[1]}?autoplay=1&mute=1";
                         elseif (preg_match('/youtu\.be\/([^?]+)/', $url, $m)) $embed_url = "https://www.youtube.com/embed/{$m[1]}?autoplay=1&mute=1";
                         elseif (strpos($url, '/embed/') !== false) $embed_url = $url;
-
-                        if ($embed_url) echo '<iframe src="' . htmlspecialchars($embed_url, ENT_QUOTES, 'UTF-8') . '" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>';
+                        if ($embed_url) echo '<div class="video-wrapper"><iframe src="' . $embed_url . '" allow="autoplay; encrypted-media" allowfullscreen></iframe></div>';
                         else echo '<div class="unsupported">Invalid YouTube URL.<br><a href="' . $safe_url . '" target="_blank">Open on YouTube</a></div>';
                     } elseif (strpos($url, 'twitch.tv') !== false) {
                         if (preg_match('/twitch\.tv\/([^\/]+)/', $url, $matches)) {
                             $channel = $matches[1];
                             $domain = $_SERVER['HTTP_HOST'] ?? 'localhost';
                             $embed = "https://player.twitch.tv/?channel={$channel}&parent={$domain}";
-                            echo '<iframe src="' . htmlspecialchars($embed, ENT_QUOTES, 'UTF-8') . '" frameborder="0" allowfullscreen></iframe>';
+                            echo '<div class="video-wrapper"><iframe src="' . $embed . '" allowfullscreen></iframe></div>';
                         } else echo '<div class="unsupported">Invalid Twitch URL.<br><a href="' . $safe_url . '" target="_blank">Open on Twitch</a></div>';
                     } elseif (strpos($url, 'teams.microsoft.com') !== false) {
-                        echo '<div class="teams-card">';
-                        echo '<strong>Microsoft Teams Meeting</strong><br>';
-                        echo '<a href="' . $safe_url . '" target="_blank" style="
-        display:inline-block;
-        margin-top:10px;
-        padding:8px 12px;
-        background:#0078d7;
-        color:white;
-        border-radius:4px;
-        text-decoration:none;
-    ">Join Meeting</a>';
-                        echo '</div>';
+                        echo '<div class="teams-card"><strong>Microsoft Teams Meeting</strong><br>
+                              <a href="' . $safe_url . '" target="_blank" style="display:inline-block;margin-top:10px;padding:8px 12px;background:#0078d7;color:white;border-radius:4px;">Join Meeting</a></div>';
                     } elseif (strpos($url, 'facebook.com') !== false || strpos($url, 'fb.watch') !== false) {
                         $embed_url = "https://www.facebook.com/plugins/video.php?href=" . urlencode($url) . "&show_text=0&width=320";
-                        echo '<iframe src="' . htmlspecialchars($embed_url, ENT_QUOTES, 'UTF-8') . '" width="320" height="180" style="border:none;overflow:hidden" scrolling="no" frameborder="0" allowfullscreen="true" allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share"></iframe>';
+                        echo '<div class="video-wrapper"><iframe src="' . $embed_url . '" allowfullscreen></iframe></div>';
+                    } elseif (strpos($url, 'cameraftp.com') !== false) {
+                        // ✅ CameraFTP Embed Handling
+                        if (stripos($url, 'https://') === false) {
+                            $url = 'https://' . ltrim($url, '/');
+                        }
+                        if (strpos($url, 'isEmbedded=true') !== false) {
+                            echo '<div class="video-wrapper">
+                                    <iframe src="' . $url . '" 
+                                        allowfullscreen 
+                                        scrolling="no" 
+                                        style="border:0;overflow:hidden;" 
+                                        loading="lazy">
+                                    </iframe>
+                                  </div>';
+                        } else {
+                            echo '<div class="teams-card">
+                                    <strong>CameraFTP Link Detected</strong><br>
+                                    <p>Please use the "Embed" version of your CameraFTP link (it should include <code>isEmbedded=true</code>).</p>
+                                    <a href="' . $safe_url . '" target="_blank" style="display:inline-block;margin-top:10px;padding:8px 12px;background:#0078d7;color:white;border-radius:4px;">Open Camera</a>
+                                  </div>';
+                        }
                     } else {
                         echo '<div class="unsupported">Cannot embed this source.<br><a href="' . $safe_url . '" target="_blank">Open directly</a></div>';
                     }
@@ -235,8 +253,12 @@ for ($i = 1; $i <= 30; $i++) {
                 document.getElementById(tab.dataset.tab).classList.add('active');
             });
         });
+
+        // Auto-switch to video tab after submission
+        <?php if ($_SERVER['REQUEST_METHOD'] === 'POST'): ?>
+            document.querySelector('.tab[data-tab="videos"]').click();
+        <?php endif; ?>
     </script>
 
 </body>
-
 </html>
