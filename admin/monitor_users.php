@@ -39,7 +39,7 @@ LEFT JOIN tbl_employee_info e ON e.emp_id = r.emp_id
 LEFT JOIN (
     SELECT 
         emp_id,
-        MIN(punch_in) AS punch_in,
+        MAX(punch_in) AS punch_in,
         MAX(punch_out) AS punch_out,
         MIN(break_in) AS break_in,
         MAX(break_out) AS break_out,
