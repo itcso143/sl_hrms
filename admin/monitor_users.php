@@ -41,9 +41,9 @@ LEFT JOIN (
         emp_id,
         MAX(punch_in) AS punch_in,
         MAX(punch_out) AS punch_out,
-        MIN(break_in) AS break_in,
+        MAX(break_in) AS break_in,
         MAX(break_out) AS break_out,
-        MIN(lunch_in) AS lunch_in,
+        MAX(lunch_in) AS lunch_in,
         MAX(lunch_out) AS lunch_out,
         -- Add schedule_code if needed, else null
         MAX(schedule_code) AS schedule_code,
