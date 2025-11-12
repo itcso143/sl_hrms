@@ -29,11 +29,11 @@ SELECT
     t.lunch_out,
     t.schedule_code,
     t.date_logs,
- IF(
-    r.last_activity IS NULL, 
-    'offline',
-    IF(TIMESTAMPDIFF(MINUTE, r.last_activity, NOW()) <= 5, 'online', 'offline')
-) AS current_status
+    IF(
+        r.last_activity IS NULL, 
+        'offline',
+        IF(TIMESTAMPDIFF(MINUTE, r.last_activity, NOW()) <= 5, 'online', 'offline')
+    ) AS current_status
 FROM tbl_users r
 LEFT JOIN tbl_employee_info e ON e.emp_id = r.emp_id
 LEFT JOIN (
@@ -45,27 +45,16 @@ LEFT JOIN (
         MAX(break_out) AS break_out,
         MAX(lunch_in) AS lunch_in,
         MAX(lunch_out) AS lunch_out,
-        -- Add schedule_code if needed, else null
         MAX(schedule_code) AS schedule_code,
         MAX(date_logs) AS date_logs
-    FROM (
-        SELECT emp_id, punch_in, punch_out, break_in, break_out, lunch_in, lunch_out, schedule_code, date_logs
-        FROM tbl_employee_timelogs
-        WHERE DATE(date_logs) = :today
-
-        UNION ALL
-
-        SELECT emp_id, punch_in, punch_out, break_in, break_out, lunch_in, lunch_out, schedule_code, date_logs
-        FROM tbl_employee_timelogs
-        WHERE DATE(date_logs) = :yesterday AND TIME(punch_in) >= '23:00:00'
-    ) combined
+    FROM tbl_employee_timelogs
+    WHERE DATE(date_logs) = :today   -- ✅ Only today's records
     GROUP BY emp_id
 ) t ON t.emp_id = r.emp_id
 ORDER BY r.id ASC";
 
 $stmt = $con->prepare($sql);
-$stmt->bindParam(':today', $today);
-$stmt->bindParam(':yesterday', $yesterday);
+$stmt->bindValue(':today', date('Y-m-d'));
 $stmt->execute();
 ?>
 
@@ -114,3 +103,4 @@ $stmt->execute();
     </tr>
   <?php endwhile; ?>
 </table>
+
