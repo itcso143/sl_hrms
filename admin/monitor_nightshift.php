@@ -43,7 +43,7 @@ LEFT JOIN (
         emp_id,
         MIN(CASE WHEN DATE(date_logs) = :today THEN punch_in END) AS today_punch_in,
         MAX(CASE WHEN DATE(date_logs) = :today THEN punch_out END) AS today_punch_out,
-        MIN(CASE WHEN DATE(date_logs) = :yesterday AND TIME(punch_in) >= '21:00:00' THEN punch_in END) AS yesterday_punch_in,
+        MIN(CASE WHEN DATE(date_logs) = :yesterday AND TIME(punch_in) >= '20:00:00' THEN punch_in END) AS yesterday_punch_in,
         MAX(break_in) AS break_in,
         MAX(break_out) AS break_out,
         MAX(lunch_in) AS lunch_in,
