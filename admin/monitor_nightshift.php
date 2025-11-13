@@ -65,7 +65,7 @@ $stmt->execute();
 <table border="1" cellpadding="5" style="margin: 0 auto; border-collapse: collapse; text-align: center;">
     <tr style="background-color: #f0f0f0;">
         <th style="width: 6%;">Emp ID</th>
-        <th style="width: 25%;">Name</th>
+        <th style="width: 20%;">Name</th>
         <th style="width: 6%;">User Type</th>
         <th style="width: 11%;">Last Activity</th>
         <th style="width: 6%;">Date Logs</th>
