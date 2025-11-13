@@ -21,7 +21,7 @@ $logs_id_final = '';
 $get_logs_id = '';
 
 $emp_id_new2 = '';
-$logs_id_new ='';
+$logs_id_new = '';
 
 include('update_user_activity.php');
 
@@ -62,7 +62,7 @@ while ($result4 = $user_data->fetch(PDO::FETCH_ASSOC)) {
     $get_logs_id = $result4['logs_id'];
   }
 
- 
+
   $date_logs1 = date('Y-m-d');
 
   // Prepare SQL to get today's punch-in for this employee
@@ -257,7 +257,7 @@ while ($result4 = $user_data->fetch(PDO::FETCH_ASSOC)) {
             <!-- MODAL BODY -->
             <div class="modal-body text-center">
               <p>Click the button to log your time.</p>
-      
+
               <h4 class="fw-bold mt-3">
                 <!-- PHP Date -->
                 <?php echo date('F j, Y'); ?>
@@ -594,15 +594,37 @@ while ($result4 = $user_data->fetch(PDO::FETCH_ASSOC)) {
         </ul>
 
 
-        <!-- <ul class="nav nav-treeview">
+      </li>
+
+      <li class="nav-item has-treeview">
+        <a href="#" class="nav-link">
+          <i class="nav-icon fa fa-folder"></i>
+          <p>
+            Attendance
+            <i class="right fa fa-angle-left"></i>
+          </p>
+        </a>
+        <ul class="nav nav-treeview">
           <li class="nav-item">
-            <a href="" class="nav-link">
-              <i class="fa fa-file nav-icon"></i>
-              <p>Payroll</p>
+            <a href="attendance_dayshift.php" class="nav-link" target="_blank">
+              <i class="fa fa-clock-o nav-icon"></i>
+              <p>Day Shift</p>
             </a>
           </li>
+        </ul>
 
-        </ul> -->
+        <ul class="nav nav-treeview">
+          <li class="nav-item">
+            <a href="attendance_nightshift.php" class="nav-link" target="_blank">
+              <i class="fa fa-clock-o nav-icon"></i>
+              <p>Night Shift</p>
+            </a>
+          </li>
+        </ul>
+
+
+
+
       </li>
 
       <li class="nav-item has-treeview">
@@ -633,17 +655,9 @@ while ($result4 = $user_data->fetch(PDO::FETCH_ASSOC)) {
 
         </ul>
 
+
+
         <ul class="nav nav-treeview">
-          <li class="nav-item">
-            <a href="users_monitoring" class="nav-link" target="_blank" rel="noopener noreferrer">
-              <i class="fa fa-folder nav-icon"></i>
-              <p>Monitor Users</p>
-            </a>
-          </li>
-
-        </ul>
-
-         <ul class="nav nav-treeview">
           <li class="nav-item">
             <a href="live_stream" class="nav-link" target="_blank" rel="noopener noreferrer">
               <i class="fa fa-folder nav-icon"></i>
