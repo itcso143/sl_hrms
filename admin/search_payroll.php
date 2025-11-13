@@ -26,7 +26,7 @@ $columns = array(
 $requestData = $_REQUEST;
 
 
-$get_employee_sql = "SELECT * FROM tbl_weekly_payslip where status='ACTIVE' ORDER BY id DESC";
+$get_employee_sql = "SELECT * FROM tbl_weekly_payslip where status='ACTIVE' ORDER BY id DESC LIMIT 10";
 
 $getIndividualData = $con->prepare($get_employee_sql);
 $getIndividualData->execute();
