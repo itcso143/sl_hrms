@@ -19,7 +19,7 @@ $requestData = $_REQUEST;
 $requestData = $_REQUEST;
 
 
-$get_employee_sql = "SELECT * FROM tbl_emp_salary where status='ACTIVE' ORDER BY id ASC LIMIT 10";
+$get_employee_sql = "SELECT * FROM tbl_emp_salary where status='ACTIVE' ORDER BY id DESC LIMIT 10";
 
 $getIndividualData = $con->prepare($get_employee_sql);
 $getIndividualData->execute();
