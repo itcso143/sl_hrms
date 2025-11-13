@@ -308,6 +308,54 @@ $get_emp_netpay_data->execute();
                       </div>
 
                     </div>
+                    <br>
+                    <!-- OT -->
+                    <div class="row">
+                      <div class="col-lg-3">
+                        <label for="emp_ot_additional">OT:</label>
+                        <input type="text" name="emp_ot_additional" id="emp_ot_additional" class="form-control">
+                      </div>
+
+                      <div class="col-lg-3">
+                        <label for="emp_ot_quantity">Quantity:</label>
+                        <input type="number" name="emp_ot_quantity" id="emp_ot_quantity" class="form-control">
+                      </div>
+
+                      <div class="col-lg-3">
+                        <label for="emp_ot_rate">Rate:</label>
+                        <input type="number" name="emp_ot_rate" id="emp_ot_rate" class="form-control">
+                      </div>
+
+                      <div class="col-lg-3">
+                        <label for="emp_ot_total">Total OT:</label>
+                        <input type="number" name="emp_ot_total" id="emp_ot_total" class="form-control">
+                      </div>
+
+                    </div>
+                    <br>
+                    <!-- BONUS -->
+                    <div class="row">
+                      <div class="col-lg-3">
+                        <label for="emp_bonus_additional">BONUS:</label>
+                        <input type="text" name="emp_bonus_additional" id="emp_bonus_additional" class="form-control">
+                      </div>
+
+                      <div class="col-lg-3">
+                        <label for="emp_bonus_quantity">Quantity:</label>
+                        <input type="number" name="emp_bonus_quantity" id="emp_bonus_quantity" class="form-control">
+                      </div>
+
+                      <div class="col-lg-3">
+                        <label for="emp_bonus_rate">Rate:</label>
+                        <input type="number" name="emp_bonus_rate" id="emp_bonus_rate" class="form-control">
+                      </div>
+
+                      <div class="col-lg-3">
+                        <label for="emp_bonus_total">Total BONUS:</label>
+                        <input type="number" name="emp_bonus_total" id="emp_bonus_total" class="form-control">
+                      </div>
+
+                    </div>
 
                     <br>
 
@@ -319,17 +367,24 @@ $get_emp_netpay_data->execute();
                         </div>
                       </div>
 
-                      <div class="col-lg-4 col-md-4 col-sm-6">
+                      <div class="col-lg-3 col-md-4 col-sm-6">
                         <div class="mb-3">
                           <label for="payroll_gross" class="form-label">Gross Pay</label>
                           <input type="number" class="form-control" id="payroll_gross" name="payroll_gross" placeholder="Enter amount">
                         </div>
                       </div>
 
-                      <div class="col-lg-4 col-md-4 col-sm-6">
+                      <div class="col-lg-3 col-md-4 col-sm-6">
                         <div class="mb-3">
                           <label for="total_emp_deduction" class="form-label">Deduction</label>
                           <input type="number" class="form-control" id="total_emp_deduction" name="total_emp_deduction" placeholder="Enter amount">
+                        </div>
+                      </div>
+
+                      <div class="col-lg-3 col-md-4 col-sm-6">
+                        <div class="mb-3">
+                          <label for="total_emp_additional" class="form-label">Additional</label>
+                          <input type="number" class="form-control" id="total_emp_additional" name="total_emp_additional" placeholder="Enter amount">
                         </div>
                       </div>
                     </div>
@@ -703,13 +758,20 @@ $get_emp_netpay_data->execute();
                   var late = parseFloat($('#emp_total_late').val()) || 0;
                   var absences = parseFloat($('#emp_total_absences').val()) || 0;
                   var hrmo = parseFloat($('#emp_hrmo_total').val()) || 0;
+
+                  var overtime = parseFloat($('#emp_ot_total').val()) || 0;
+                  var bonus = parseFloat($('#emp_bonus_total').val()) || 0;
+
+
                   var totalDeduction = late + absences + hrmo;
-                  var newNetPay = baseNetPay - totalDeduction;
+                  var totalAddition = overtime + bonus;
+                  var newNetPay = baseNetPay - totalDeduction + totalAddition;
+
                   $('#emp_total_netpay').val(newNetPay >= 0 ? newNetPay.toFixed(2) : '0.00');
                 }
 
                 // Bind input events to recalc net pay
-                $('#emp_total_late, #emp_total_absences, #emp_hrmo_total')
+                $('#emp_total_late, #emp_total_absences, #emp_hrmo_total, #emp_ot_total, #emp_bonus_total')
                   .off('input')
                   .on('input', recalcNetPay);
 
@@ -741,26 +803,25 @@ $get_emp_netpay_data->execute();
         setupDeductionCalc('#emp_quantity_late', '#emp_rate_late', '#emp_total_late');
         setupDeductionCalc('#emp_hrmo_quantity', '#emp_hrmo_rate', '#emp_hrmo_total');
 
+
+        // --- Deduction calculation helper ---
+        function setupAdditionCalc(qtySelector, rateSelector, totalSelector) {
+          $(qtySelector + ', ' + rateSelector).on('input', function() {
+            var qty = parseFloat($(qtySelector).val()) || 0;
+            var rate = parseFloat($(rateSelector).val()) || 0;
+            var total = qty * rate;
+            $(totalSelector).val(total.toFixed(2)).trigger('input'); // triggers net pay recalculation
+          });
+        }
+
+        // --- Initialize deduction calculations ---
+        setupAdditionCalc('#emp_ot_quantity', '#emp_ot_rate', '#emp_ot_total');
+        setupAdditionCalc('#emp_bonus_quantity', '#emp_bonus_rate', '#emp_bonus_total');
+
+
       });
 
 
-
-      // Deduction calculations for quantity * rate fields
-      function setupDeductionCalc(qtySelector, rateSelector, totalSelector) {
-        $(qtySelector + ', ' + rateSelector).on('input', function() {
-          var qty = parseFloat($(qtySelector).val()) || 0;
-          var rate = parseFloat($(rateSelector).val()) || 0;
-          var total = qty * rate;
-          $(totalSelector).val(total.toFixed(2));
-
-          // Trigger net pay recalculation
-          $(totalSelector).trigger('input');
-        });
-      }
-
-      setupDeductionCalc('#emp_quantity_absences', '#emp_rate_absences', '#emp_total_absences');
-      setupDeductionCalc('#emp_quantity_late', '#emp_rate_late', '#emp_total_late');
-      setupDeductionCalc('#emp_hrmo_quantity', '#emp_hrmo_rate', '#emp_hrmo_total');
 
     });
 
@@ -1175,12 +1236,40 @@ $get_emp_netpay_data->execute();
     $(document).ready(function() {
 
       // Function to recalc HMO total
+      function recalcLateTotal() {
+
+        var quantity = parseFloat($('#emp_late_quantity').val()) || 0;
+        var rate = parseFloat($('#emp_late_rate').val()) || 0;
+        var total = quantity * rate;
+
+        $('#emp_total_late').val(total.toFixed(2));
+
+        // Update overall total deduction
+        recalcTotalDeduction();
+      }
+
+      // Function to recalc HMO total
       function recalcHmoTotal() {
+
         var quantity = parseFloat($('#emp_hrmo_quantity').val()) || 0;
         var rate = parseFloat($('#emp_hrmo_rate').val()) || 0;
         var total = quantity * rate;
 
         $('#emp_hrmo_total').val(total.toFixed(2));
+
+        var quantity = parseFloat($('#emp_quantity_late').val()) || 0;
+        var rate = parseFloat($('#emp_rate_late').val()) || 0;
+        var total = quantity * rate;
+
+        $('#emp_total_late').val(total.toFixed(2));
+
+        var quantity = parseFloat($('#emp_quantity_absences').val()) || 0;
+        var rate = parseFloat($('#emp_rate_absences').val()) || 0;
+        var total = quantity * rate;
+
+        $('#emp_total_absences').val(total.toFixed(2));
+
+    
 
         // Update overall total deduction
         recalcTotalDeduction();
@@ -1192,19 +1281,78 @@ $get_emp_netpay_data->execute();
         var absences = parseFloat($('#emp_total_absences').val()) || 0;
         var late = parseFloat($('#emp_total_late').val()) || 0;
 
-        var totalDeduction = hmo + absences + late;
+        var totalDeduction = late + absences + hmo;
 
         $('#total_emp_deduction').val(totalDeduction.toFixed(2));
       }
 
       // Bind recalculation to HMO quantity or rate change
-      $('#emp_hrmo_quantity, #emp_hrmo_rate').on('input', recalcHmoTotal);
+      $('#emp_hrmo_quantity, #emp_hrmo_rate, #emp_quantity_late, #emp_rate_late, #emp_quantity_absences, #emp_rate_absences').on('input', recalcHmoTotal);
 
       // Optionally, also recalc if absences or late are changed
-      $('#emp_total_absences, #emp_total_late').on('input', recalcTotalDeduction);
+      $('#emp_total_absences, #emp_total_late, #emp_hrmo_total').on('input', recalcTotalDeduction);
 
     });
   </script>
+
+
+ <script>
+    $(document).ready(function() {
+
+      // Function to recalc HMO total
+      function recalcLateTotal() {
+
+        var quantity = parseFloat($('#emp_ot_quantity').val()) || 0;
+        var rate = parseFloat($('#emp_ot_rate').val()) || 0;
+        var total = quantity * rate;
+
+        $('#emp_ot_total').val(total.toFixed(2));
+
+        // Update overall total deduction
+        recalcTotalDeduction();
+      }
+
+      // Function to recalc HMO total
+      function recalcHmoTotal() {
+
+        var quantity = parseFloat($('#emp_ot_quantity').val()) || 0;
+        var rate = parseFloat($('#emp_ot_rate').val()) || 0;
+        var total = quantity * rate;
+
+        $('#emp_ot_total').val(total.toFixed(2));
+
+        var quantity = parseFloat($('#emp_bonus_quantity').val()) || 0;
+        var rate = parseFloat($('#emp_bonus_rate').val()) || 0;
+        var total = quantity * rate;
+
+        $('#emp_bonus_total').val(total.toFixed(2));
+
+
+    
+
+        // Update overall total deduction
+        recalcTotalDeduction();
+      }
+
+      // Function to sum all deductions
+      function recalcTotalDeduction() {
+        var ot = parseFloat($('#emp_ot_total').val()) || 0;
+        var bonus = parseFloat($('#emp_bonus_total').val()) || 0;
+ 
+        var totalDeduction = ot + bonus;
+
+        $('#total_emp_additional').val(totalDeduction.toFixed(2));
+      }
+
+      // Bind recalculation to HMO quantity or rate change
+      $('#emp_ot_quantity, #emp_ot_rate, #emp_bonus_quantity, #emp_bonus_rate').on('input', recalcHmoTotal);
+
+      // Optionally, also recalc if absences or late are changed
+      $('#emp_ot_total, #emp_bonus_total').on('input', recalcTotalDeduction);
+
+    });
+  </script>
+
 
   <script>
     $(document).ready(function() {

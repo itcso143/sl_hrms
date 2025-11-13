@@ -84,15 +84,25 @@ if ($payroll_id == $payroll_id) {
     $emp_hrmo_rate = $result['emp_hrmo_rate'];
     $emp_hrmo_total = $result['emp_hrmo_total'];
 
+    $emp_ot_additional = $result['emp_ot_additional'];
+    $emp_ot_quantity = $result['emp_ot_quantity'];
+    $emp_ot_rate = $result['emp_ot_rate'];
+    $emp_ot_total = $result['emp_ot_total'];
+
+    $emp_bonus_additional = $result['emp_bonus_additional'];
+    $emp_bonus_quantity = $result['emp_bonus_quantity'];
+    $emp_bonus_rate = $result['emp_bonus_rate'];
+    $emp_bonus_total = $result['emp_bonus_total'];
 
 
-$get_emp_info_sql = "SELECT * FROM tbl_employee_info where emp_id = :emp_id";
+
+    $get_emp_info_sql = "SELECT * FROM tbl_employee_info where emp_id = :emp_id";
     $get_emp_info_data = $con->prepare($get_emp_info_sql);
     $get_emp_info_data->execute([':emp_id' => $emp_id2]);
     while ($result = $get_emp_info_data->fetch(PDO::FETCH_ASSOC)) {
 
-     
-     
+
+
 
       $date_joining = $result['date_joining'];
       $formatted_date_joining = date("F d, Y", strtotime($date_joining));
@@ -153,7 +163,7 @@ $get_emp_info_sql = "SELECT * FROM tbl_employee_info where emp_id = :emp_id";
 }
 
 $pdf->SetFont('helvetica', 'B', 25);
-$pdf->Cell(0, 12,  'PAYSLIP', '', 1, C);
+$pdf->Cell(0, 6,  'PAYSLIP', '', 1, C);
 
 
 
@@ -165,7 +175,7 @@ $pdf->SetFont('helvetica', '', 9);
 
 $pdf->Ln(0);
 // Title section
-$html = '<table cellspacing="0" cellpadding="5" border="0">
+$html = '<table cellspacing="0" cellpadding="1" border="0">
 <tr>
   <td width="100%">
     <strong>Serial:</strong> ' . $serial_no . '<br>
@@ -176,14 +186,14 @@ $html = '<table cellspacing="0" cellpadding="5" border="0">
 </table>
 <br>
 
-<table border="1" cellpadding="5" cellspacing="0">
+<table border="1" cellpadding="4" cellspacing="0" style="font-size:8px;">
 <tr style="background-color:#f2f2f2;">
   <td width="50%"><strong>Employee</strong></td>
   <td width="50%"><strong>Company</strong></td>
 </tr>
 <tr>
   <td>
-    ' . $fullname . '<br>
+   <strong>' . $fullname . '</strong><br>
     Hired Date: ' . $formatted_date_joining . '<br>
     Birthday: ' . $formatted_date_birthdate . '<br>
     Phone: ' . $mobile_no . '<br>
@@ -215,7 +225,7 @@ $html = '<table cellspacing="0" cellpadding="5" border="0">
 <br><br>
 
 
-<table border="1" cellpadding="6" cellspacing="0" width="100%">
+<table border="1" cellpadding="6" cellspacing="0" width="100%" >
     <tr style="background-color:#1F4E79;color:white;">
         <th width="25%">Week of</th>
         <th width="20%">Hours Worked</th>
@@ -226,9 +236,9 @@ $html = '<table cellspacing="0" cellpadding="5" border="0">
     <tr>
         <td>' . $formatted_date_from . '- ' . $formatted_date_to . '</td>
         <td>' . $daily_hours . '</td>
-        <td>' .'$'. $payroll_gross . '</td>
-        <td>' .'$'. $total_emp_deduction . '</td>
-        <td>' .'$'. $emp_total_netpay . '</td>
+        <td>' . '$' . $payroll_gross . '</td>
+        <td>' . '$' . $total_emp_deduction . '</td>
+        <td>' . '$' . $emp_total_netpay . '</td>
     </tr>
 
      <tr style="background-color:#f2f2f2;font-weight:bold;">
@@ -236,7 +246,7 @@ $html = '<table cellspacing="0" cellpadding="5" border="0">
         <td></td>
         <td></td>
        <td style="text-align: left !important;">TOTAL</td>
-        <td>' .'$'. $emp_total_netpay . '</td>
+        <td>' . '$' . $emp_total_netpay . '</td>
     </tr>
   
 </table>
@@ -244,7 +254,32 @@ $html = '<table cellspacing="0" cellpadding="5" border="0">
 <br>
 <br>
 
-<table border="1" cellpadding="4" cellspacing="0">
+<table border="1" cellpadding="4" cellspacing="0" style="font-size:8px;">
+<tr style="background-color:#f2f2f2;">
+  <th width="50%"><strong>Additional</strong></th>
+  <th width="15%"><strong>Quantity</strong></th>
+  <th width="15%"><strong>Rate</strong></th>
+  <th width="20%"><strong>Total</strong></th>
+</tr>
+
+<tr>
+  <td>OVER TIME</td>
+  <td align="center">' . $emp_ot_quantity . '</td>
+  <td align="right">' . '$ '  . $emp_ot_rate . '</td>
+  <td align="right">' . '$ ' . $emp_ot_total . '</td>
+</tr>
+<tr>
+  <td>BONUS</td>
+  <td align="center">' . $emp_bonus_quantity . '</td>
+  <td align="right">' . '$ '  . $emp_bonus_rate . '</td>
+  <td align="right">' . '$ '  . $emp_bonus_total . '</td>
+</tr>
+
+</table>
+
+<br>
+<br>
+<table border="1" cellpadding="4" cellspacing="0" style="font-size:8px;">
 <tr style="background-color:#f2f2f2;">
   <th width="50%"><strong>Deduction</strong></th>
   <th width="15%"><strong>Quantity</strong></th>
@@ -278,25 +313,25 @@ $html = '<table cellspacing="0" cellpadding="5" border="0">
 <tr>
   <td>HMO</td>
   <td align="center">' . $emp_hrmo_quantity . '</td>
-  <td align="right">'.'$ '  . $emp_hrmo_rate . '</td>
-  <td align="right">' .'$ ' . $emp_hrmo_total . '</td>
+  <td align="right">' . '$ '  . $emp_hrmo_rate . '</td>
+  <td align="right">' . '$ ' . $emp_hrmo_total . '</td>
 </tr>
 <tr>
   <td>LATE</td>
   <td align="center">' . $emp_quantity_late . '</td>
-  <td align="right">'.'$ '  . $emp_rate_late . '</td>
-  <td align="right">'.'$ '  . $emp_total_late . '</td>
+  <td align="right">' . '$ '  . $emp_rate_late . '</td>
+  <td align="right">' . '$ '  . $emp_total_late . '</td>
 </tr>
 <tr>
   <td>ABSENCES</td>
   <td align="center">' . $emp_quantity_absences . '</td>
-  <td align="right">'.'$ '  . $emp_rate_absences . '</td>
-  <td align="right">'.'$ '  . $emp_total_absences . '</td>
+  <td align="right">' . '$ '  . $emp_rate_absences . '</td>
+  <td align="right">' . '$ '  . $emp_total_absences . '</td>
 </tr>
 </table>
 <br>
-<br>
-<table cellpadding="4">
+
+<table cellpadding="2">
 <tr><td><strong>Current Gross Pay:</strong></td><td align="right" style="font-size: 10px;">$ ' . $payroll_gross . '</td></tr>
 <tr><td><strong>Current Net Pay:</strong></td><td align="right" style="font-size: 12px;"><strong>$ ' . $emp_total_netpay . '</strong></td></tr>
 ';

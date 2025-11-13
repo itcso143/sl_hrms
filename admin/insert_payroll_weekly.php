@@ -36,7 +36,19 @@ if (isset($_POST['insert_payroll_weekly'])) {
     $emp_hrmo_rate = $_POST['emp_hrmo_rate'];
     $emp_hrmo_total = $_POST['emp_hrmo_total'];
 
-     $company  = $_POST['get_company'] ?? '';
+
+    $emp_ot_additional = $_POST['emp_ot_additional'];
+    $emp_ot_quantity = $_POST['emp_ot_quantity'];
+    $emp_ot_rate = $_POST['emp_ot_rate'];
+    $emp_ot_total = $_POST['emp_ot_total'];
+
+    $emp_bonus_additional = $_POST['emp_bonus_additional'];
+    $emp_bonus_quantity = $_POST['emp_bonus_quantity'];
+    $emp_bonus_rate = $_POST['emp_bonus_rate'];
+    $emp_bonus_total = $_POST['emp_bonus_total'];
+
+
+    $company  = $_POST['get_company'] ?? '';
 
 
     // ✅ Use proper INSERT INTO syntax
@@ -56,7 +68,9 @@ if (isset($_POST['insert_payroll_weekly'])) {
             serial_no,
       emp_late_deduction, emp_quantity_late, emp_rate_late, emp_total_late,
       emp_absences_deduction, emp_quantity_absences, emp_rate_absences, emp_total_absences,
-       emp_hrmo_deduction, emp_hrmo_quantity, emp_hrmo_rate, emp_hrmo_total
+       emp_hrmo_deduction, emp_hrmo_quantity, emp_hrmo_rate, emp_hrmo_total, emp_ot_additional,
+       emp_ot_quantity,emp_ot_rate,emp_ot_total,emp_bonus_additional,emp_bonus_quantity,emp_bonus_rate,
+       emp_bonus_total
 
            
         ) VALUES (
@@ -73,9 +87,9 @@ if (isset($_POST['insert_payroll_weekly'])) {
             :emp_total_netpay, :serial_no
       , :emp_late_deduction, :emp_quantity_late, :emp_rate_late, :emp_total_late,
       :emp_absences_deduction, :emp_quantity_absences, :emp_rate_absences, :emp_total_absences,
-       :emp_hrmo_deduction, :emp_hrmo_quantity, :emp_hrmo_rate, :emp_hrmo_total
-        )
-    ";
+       :emp_hrmo_deduction, :emp_hrmo_quantity, :emp_hrmo_rate, :emp_hrmo_total, :emp_ot_additional,
+       :emp_ot_quantity, :emp_ot_rate, :emp_ot_total, :emp_bonus_additional, :emp_bonus_quantity,
+       :emp_bonus_rate, :emp_bonus_total)";
 
     $stmt = $con->prepare($insert_payroll_weekly_sql);
 
@@ -110,8 +124,18 @@ if (isset($_POST['insert_payroll_weekly'])) {
         ':emp_hrmo_deduction'     => $emp_hrmo_deduction,
         ':emp_hrmo_quantity'     => $emp_hrmo_quantity,
         ':emp_hrmo_rate' => number_format($emp_hrmo_rate, 2),
+        ':emp_hrmo_total' => number_format($emp_hrmo_total, 2),
 
-        ':emp_hrmo_total' => number_format($emp_hrmo_total, 2)
+        ':emp_ot_additional'     => $emp_ot_additional,
+        ':emp_ot_quantity'     => $emp_ot_quantity,
+        ':emp_ot_rate' => number_format($emp_ot_rate, 2),
+        ':emp_ot_total' => number_format($emp_ot_total, 2),
+
+        ':emp_bonus_additional'     => $emp_bonus_additional,
+        ':emp_bonus_quantity'     => $emp_bonus_quantity,
+        ':emp_bonus_rate' => number_format($emp_bonus_rate, 2),
+        ':emp_bonus_total' => number_format($emp_bonus_total, 2)
+
 
 
     ]);
