@@ -86,6 +86,16 @@ if ($salary_id == $salary_id) {
     $emp_hrmo_rate = $result['emp_hrmo_rate'];
     $emp_hrmo_total = $result['emp_hrmo_total'];
 
+    $emp_ot_additional = $result['emp_ot_additional'];
+    $emp_ot_quantity = $result['emp_ot_quantity'];
+    $emp_ot_rate = $result['emp_ot_rate'];
+    $emp_ot_total = $result['emp_ot_total'];
+
+    $emp_bonus_additional = $result['emp_bonus_additional'];
+    $emp_bonus_quantity = $result['emp_bonus_quantity'];
+    $emp_bonus_rate = $result['emp_bonus_rate'];
+    $emp_bonus_total = $result['emp_bonus_total'];
+
 
 
 
@@ -156,7 +166,7 @@ if ($salary_id == $salary_id) {
 }
 
 $pdf->SetFont('helvetica', 'B', 25);
-$pdf->Cell(0, 15,  'PAY SLIP', '', 1, C);
+$pdf->Cell(0, 10,  'PAY SLIP', '', 1, C);
 // $pdf->SetFont('times', 'B', 9);
 // $pdf->Cell(192, 5,  '', '', 5, L);
 // $pdf->Cell(192, 5,  '', '', 5, L);
@@ -173,7 +183,7 @@ $pdf->SetFont('helvetica', '', 9);
 
 $pdf->Ln(0);
 $html = '
-<table cellspacing="0" cellpadding="5" border="0">
+<table cellspacing="0" cellpadding="1" border="0">
 <tr>
   <td width="100%">
     <strong>Serial:</strong> ' . $serial_no . '<br>
@@ -184,14 +194,14 @@ $html = '
 </table>
 <br>
 
-<table border="1" cellpadding="5" cellspacing="0">
+<table border="1" cellpadding="4" cellspacing="0" style="font-size:8px;">
 <tr style="background-color:#f2f2f2;">
   <td width="50%"><strong>Employee</strong></td>
   <td width="50%"><strong>Company</strong></td>
 </tr>
 <tr>
   <td>
-    ' . $fullname . '<br>
+      <strong>' . $fullname . '</strong><br>
     Hired Date: ' . $formatted_date_joining . '<br>
     Birthday: ' . $formatted_date_birthdate . '<br>
     Phone: ' . $mobile_no . '<br>
@@ -207,7 +217,7 @@ $html = '
 </table>
 <br><br>
 
-<table border="1" cellpadding="5" cellspacing="0">
+<table border="1" cellpadding="4" cellspacing="0" style="font-size:8px;">
 <tr style="background-color:#f2f2f2;">
   <td><strong>Payment Details</strong></td>
 </tr>
@@ -223,7 +233,7 @@ $html = '
 <br><br>
 
 <table border="1" cellpadding="6" cellspacing="0">
-<tr style="background-color:#f2f2f2;">
+  <tr style="background-color:#1F4E79;color:white;">
   <th width="50%"><strong>Earnings</strong></th>
   <th width="15%"><strong>Quantity</strong></th>
   <th width="15%"><strong>Rate</strong></th>
@@ -240,7 +250,32 @@ $html = '
 <br>
 <br>
 
-<table border="1" cellpadding="4" cellspacing="0">
+<table border="1" cellpadding="4" cellspacing="0" style="font-size:8px;">
+  <tr style="background-color:#1F4E79;color:white;">
+  <th width="50%"><strong>Additional</strong></th>
+  <th width="15%"><strong>Quantity</strong></th>
+  <th width="15%"><strong>Rate</strong></th>
+  <th width="20%"><strong>Total</strong></th>
+</tr>
+
+<tr>
+  <td>OVER TIME</td>
+  <td align="center">' . $emp_ot_quantity . '</td>
+  <td align="right">'  . $emp_ot_rate . '</td>
+  <td align="right">' . $emp_ot_total . '</td>
+</tr>
+<tr>
+  <td>BONUS</td>
+  <td align="center">' . $emp_bonus_quantity . '</td>
+  <td align="right">'   . $emp_bonus_rate . '</td>
+  <td align="right">' . $emp_bonus_total . '</td>
+</tr>
+
+</table>
+
+<br>
+<br>
+<table border="1" cellpadding="4" cellspacing="0" style="font-size:8px;">
 <tr style="background-color:#f2f2f2;">
   <th width="50%"><strong>Deduction</strong></th>
   <th width="15%"><strong>Quantity</strong></th>
@@ -292,9 +327,9 @@ $html = '
 </table>
 <br>
 <br>
-<table cellpadding="4">
+<table cellpadding="1">
 <tr><td><strong>Current Gross Pay:</strong></td><td align="right">PHP ' . $emp_gross_pay . '</td></tr>
-<tr><td><strong>Current Net Pay:</strong></td><td align="right">PHP ' . $emp_current_pay . '</td></tr>
+<tr><td><strong>Current Net Pay:</strong></td><td align="right"><strong>PHP ' . $emp_current_pay . '</strong></td></tr>
 
 </table>
 

@@ -340,6 +340,56 @@ $get_emp_netpay_data->execute();
                         </div>
                         <br>
 
+                        <!-- OT -->
+                        <div class="row">
+                          <div class="col-lg-3">
+                            <label for="emp_ot_additional">OT:</label>
+                            <input type="text" name="emp_ot_additional" id="emp_ot_additional" class="form-control">
+                          </div>
+
+                          <div class="col-lg-3">
+                            <label for="emp_ot_quantity">Quantity:</label>
+                            <input type="number" name="emp_ot_quantity" id="emp_ot_quantity" class="form-control">
+                          </div>
+
+                          <div class="col-lg-3">
+                            <label for="emp_ot_rate">Rate:</label>
+                            <input type="number" name="emp_ot_rate" id="emp_ot_rate" class="form-control">
+                          </div>
+
+                          <div class="col-lg-3">
+                            <label for="emp_ot_total">Total OT:</label>
+                            <input type="number" name="emp_ot_total" id="emp_ot_total" class="form-control">
+                          </div>
+
+                        </div>
+                        <br>
+                        <!-- BONUS -->
+                        <div class="row">
+                          <div class="col-lg-3">
+                            <label for="emp_bonus_additional">BONUS:</label>
+                            <input type="text" name="emp_bonus_additional" id="emp_bonus_additional" class="form-control">
+                          </div>
+
+                          <div class="col-lg-3">
+                            <label for="emp_bonus_quantity">Quantity:</label>
+                            <input type="number" name="emp_bonus_quantity" id="emp_bonus_quantity" class="form-control">
+                          </div>
+
+                          <div class="col-lg-3">
+                            <label for="emp_bonus_rate">Rate:</label>
+                            <input type="number" name="emp_bonus_rate" id="emp_bonus_rate" class="form-control">
+                          </div>
+
+                          <div class="col-lg-3">
+                            <label for="emp_bonus_total">Total BONUS:</label>
+                            <input type="number" name="emp_bonus_total" id="emp_bonus_total" class="form-control">
+                          </div>
+
+                        </div>
+
+                        <br>
+
                         <div class="row">
                           <div class="col-lg-3">
                             <label for="emp_basic_salary">Basic Salary:</label>
@@ -992,6 +1042,27 @@ $get_emp_netpay_data->execute();
         });
 
 
+
+         $('#emp_ot_quantity, #emp_ot_rate').on('input', function() {
+          const qty = parseFloat($('#emp_ot_quantity').val()) || 0;
+          const rate = parseFloat($('#emp_ot_rate').val()) || 0;
+          const total = qty * rate;
+          $('#emp_ot_total').val(total.toFixed(2));
+
+          // 👇 Trigger recalculation of Net Pay (from your earlier script)
+          $('#emp_ot_total').trigger('input');
+        });
+
+          $('#emp_bonus_quantity, #emp_bonus_rate').on('input', function() {
+          const qty = parseFloat($('#emp_bonus_quantity').val()) || 0;
+          const rate = parseFloat($('#emp_bonus_rate').val()) || 0;
+          const total = qty * rate;
+          $('#emp_bonus_total').val(total.toFixed(2));
+
+          // 👇 Trigger recalculation of Net Pay (from your earlier script)
+          $('#emp_bonus_total').trigger('input');
+        });
+        
         $('#emp_quantity_absences, #emp_rate_absences').on('input', function() {
           const qty = parseFloat($('#emp_quantity_absences').val()) || 0;
           const rate = parseFloat($('#emp_rate_absences').val()) || 0;
@@ -1047,14 +1118,20 @@ $get_emp_netpay_data->execute();
                 var absences = parseFloat($('#emp_total_absences').val()) || 0;
                 var hrmo = parseFloat($('#emp_hrmo_total').val()) || 0;
 
+                var overtime = parseFloat($('#emp_ot_total').val()) || 0;
+                var bonus = parseFloat($('#emp_bonus_total').val()) || 0;
+
                 var totalDeduction = late + absences + hrmo;
-                var newNetPay = baseNetPay - totalDeduction;
+            
+
+                 var totalAddition = overtime + bonus;
+                  var newNetPay = baseNetPay - totalDeduction + totalAddition;
 
                 $('#netpay').val(newNetPay >= 0 ? newNetPay : 0);
               }
 
               // Bind input event to all deduction fields
-              $('#emp_total_late, #emp_total_absences, #emp_hrmo_total').off('input').on('input', recalcNetPay);
+              $('#emp_total_late, #emp_total_absences, #emp_hrmo_total, #emp_ot_total, #emp_bonus_total').off('input').on('input', recalcNetPay);
 
             } else {
               console.error("Failed to fetch net pay:", response.message);

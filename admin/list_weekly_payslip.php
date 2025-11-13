@@ -803,6 +803,8 @@ $get_emp_netpay_data->execute();
         setupDeductionCalc('#emp_quantity_late', '#emp_rate_late', '#emp_total_late');
         setupDeductionCalc('#emp_hrmo_quantity', '#emp_hrmo_rate', '#emp_hrmo_total');
 
+        
+
 
         // --- Deduction calculation helper ---
         function setupAdditionCalc(qtySelector, rateSelector, totalSelector) {

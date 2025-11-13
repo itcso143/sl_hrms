@@ -255,7 +255,7 @@ $html = '<table cellspacing="0" cellpadding="1" border="0">
 <br>
 
 <table border="1" cellpadding="4" cellspacing="0" style="font-size:8px;">
-<tr style="background-color:#f2f2f2;">
+  <tr style="background-color:#1F4E79;color:white;">
   <th width="50%"><strong>Additional</strong></th>
   <th width="15%"><strong>Quantity</strong></th>
   <th width="15%"><strong>Rate</strong></th>

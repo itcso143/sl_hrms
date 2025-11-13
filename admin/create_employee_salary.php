@@ -42,6 +42,16 @@ if (isset($_POST['create_employee_salary'])) {
         $emp_hrmo_rate = $_POST['emp_hrmo_rate'];
         $emp_hrmo_total = $_POST['emp_hrmo_total'];
 
+        $emp_ot_additional = $_POST['emp_ot_additional'];
+        $emp_ot_quantity = $_POST['emp_ot_quantity'];
+        $emp_ot_rate = $_POST['emp_ot_rate'];
+        $emp_ot_total = $_POST['emp_ot_total'];
+
+        $emp_bonus_additional = $_POST['emp_bonus_additional'];
+        $emp_bonus_quantity = $_POST['emp_bonus_quantity'];
+        $emp_bonus_rate = $_POST['emp_bonus_rate'];
+        $emp_bonus_total = $_POST['emp_bonus_total'];
+
 
         // Update only the schedule_code for the employee
         $employee_sql = "INSERT INTO tbl_emp_salary 
@@ -50,14 +60,19 @@ if (isset($_POST['create_employee_salary'])) {
       emp_rate, emp_total, emp_gross_pay, emp_current_pay, emp_id_salary, serial_no,
       emp_late_deduction, emp_quantity_late, emp_rate_late, emp_total_late,
       emp_absences_deduction, emp_quantity_absences, emp_rate_absences, emp_total_absences,
-       emp_hrmo_deduction, emp_hrmo_quantity, emp_hrmo_rate, emp_hrmo_total)
+       emp_hrmo_deduction, emp_hrmo_quantity, emp_hrmo_rate, emp_hrmo_total, emp_ot_additional,
+       emp_ot_quantity,emp_ot_rate,emp_ot_total,emp_bonus_additional,emp_bonus_quantity,emp_bonus_rate,
+       emp_bonus_total)
     VALUES 
     (:salary_id,:date_create_salary, :fullname_salary, :date_from,
      :date_to, :company,  :emp_basic_salary, :emp_quantity, :emp_rate,
       :emp_total, :emp_gross_pay, :emp_current_pay, :emp_id_salary, :serial_no
       , :emp_late_deduction, :emp_quantity_late, :emp_rate_late, :emp_total_late,
       :emp_absences_deduction, :emp_quantity_absences, :emp_rate_absences, :emp_total_absences,
-       :emp_hrmo_deduction, :emp_hrmo_quantity, :emp_hrmo_rate, :emp_hrmo_total)";
+       :emp_hrmo_deduction, :emp_hrmo_quantity, :emp_hrmo_rate, :emp_hrmo_total,
+        :emp_ot_additional,
+       :emp_ot_quantity, :emp_ot_rate, :emp_ot_total, :emp_bonus_additional, :emp_bonus_quantity,
+       :emp_bonus_rate, :emp_bonus_total)";
 
         $employee_data = $con->prepare($employee_sql);
         $employee_data->execute([
@@ -74,8 +89,8 @@ if (isset($_POST['create_employee_salary'])) {
             ':emp_rate' => number_format($emp_rate, 2),
             ':emp_total' => number_format($emp_total, 2),
 
-             ':emp_gross_pay' => number_format($emp_gross_pay, 2),
-     
+            ':emp_gross_pay' => number_format($emp_gross_pay, 2),
+
             ':emp_current_pay' => number_format($emp_current_pay, 2),
 
             ':emp_id_salary'     => $emp_id_salary,
@@ -97,7 +112,17 @@ if (isset($_POST['create_employee_salary'])) {
             ':emp_hrmo_quantity'     => $emp_hrmo_quantity,
             ':emp_hrmo_rate' => number_format($emp_hrmo_rate, 2),
 
-            ':emp_hrmo_total' => number_format($emp_hrmo_total, 2)
+            ':emp_hrmo_total' => number_format($emp_hrmo_total, 2),
+
+            ':emp_ot_additional'     => $emp_ot_additional,
+            ':emp_ot_quantity'     => $emp_ot_quantity,
+            ':emp_ot_rate' => number_format($emp_ot_rate, 2),
+            ':emp_ot_total' => number_format($emp_ot_total, 2),
+
+            ':emp_bonus_additional'     => $emp_bonus_additional,
+            ':emp_bonus_quantity'     => $emp_bonus_quantity,
+            ':emp_bonus_rate' => number_format($emp_bonus_rate, 2),
+            ':emp_bonus_total' => number_format($emp_bonus_total, 2)
 
 
         ]);
