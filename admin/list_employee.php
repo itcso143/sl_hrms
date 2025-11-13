@@ -147,7 +147,10 @@ $get_emp_netpay_data->execute();
                             $selected = ($get_user_schedule == $get_schedule['schedule_code']) ? 'selected' : '';
                           ?>
                             <option <?= $selected; ?> value="<?= $get_schedule['schedule_code']; ?>">
-                              <?= $get_schedule['schedule_code']; ?> - <?= $get_schedule['sched_in']; ?> - <?= $get_schedule['sched_out']; ?> - <?= $get_schedule['description']; ?>
+                              <?= $get_schedule['schedule_code']; ?> -
+                              <?= date("h:i A", strtotime($get_schedule['sched_in'])); ?> -
+                              <?= date("h:i A", strtotime($get_schedule['sched_out'])); ?> -
+                              <?= $get_schedule['description']; ?>
                             </option>
                           <?php } ?>
                         </select>
