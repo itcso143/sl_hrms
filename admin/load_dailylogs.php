@@ -11,7 +11,7 @@ if (isset($_POST['emp_id'])) {
 
     $get_all_employeelogs_data = $con->prepare($get_all_employeelogs_sql);
     $get_all_employeelogs_data->execute();
- 
+
 
     while ($list_history = $get_all_employeelogs_data->fetch(PDO::FETCH_ASSOC)) {
         echo "<tr>";
@@ -22,24 +22,14 @@ if (isset($_POST['emp_id'])) {
         echo $list_history['date_logs'];
         echo "</td>";
         echo "<td>";
-        echo $list_history['punch_in'];
+        echo date("h:i A", strtotime($list_history['punch_in'])); // AM/PM format
         echo "</td>";
         echo "<td>";
-        echo $list_history['punch_out'];
+        echo date("h:i A", strtotime($list_history['punch_out'])); // AM/PM format
         echo "</td>";
         echo "<td>";
         echo "<button class='btn btn-danger delete_logs btn-sm' data-placement='top' id='delete_logs' name='delete_logs' title='Delete Record'><i class='fa fa-trash-o'></i></button>";
-        
         echo "</td>";
         echo "</tr>";
     }
-
-
-
-
 }
-
-
-
-
-?>
