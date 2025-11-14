@@ -5,8 +5,6 @@ date_default_timezone_set('Asia/Manila');
 
 $today = date('Y-m-d');
 $yesterday = date('Y-m-d', strtotime('-1 day'));
-$get_dayshift = '';
-
 
 // Format time helper function
 function formatTime($time)
@@ -15,21 +13,7 @@ function formatTime($time)
   return date('g:i A', strtotime($time));
 }
 
-$get_info_sql = "SELECT schedule_code FROM tbl_employee_info where status='ACTIVE' AND schedule_code !='F5' ";
-$get_info_data = $con->prepare($get_info_sql);
-$get_info_data->execute();
-while ($result = $get_info_data->fetch(PDO::FETCH_ASSOC)) {
-
-
-  $get_dayshift = $result['schedule_code'];
-}
-
-
-
-if ($get_dayshift != '') {
-
-
-  $sql = "
+$sql = "
 SELECT 
     r.id,
     r.emp_id, 
@@ -50,7 +34,7 @@ SELECT
         'offline',
         IF(TIMESTAMPDIFF(MINUTE, r.last_activity, NOW()) <= 5, 'online', 'offline')
     ) AS current_status
-FROM tbl_users r
+FROM tbl_users r 
 LEFT JOIN tbl_employee_info e ON e.emp_id = r.emp_id
 LEFT JOIN (
     SELECT 
@@ -64,79 +48,62 @@ LEFT JOIN (
         MAX(schedule_code) AS schedule_code,
         MAX(date_logs) AS date_logs
     FROM tbl_employee_timelogs
-    WHERE DATE(date_logs) = :today   -- ✅ Only today's records
+    WHERE DATE(date_logs) = :today and schedule_code != 'F5'
     GROUP BY emp_id
-) t ON t.emp_id = r.emp_id WHERE t.schedule_code !='F5'
-ORDER BY r.id ASC";
+) t ON t.emp_id = r.emp_id
 
-  $day_shift = $con->prepare($sql);
-  $day_shift->bindValue(':today', date('Y-m-d'));
-  $day_shift->execute();
-};
+ORDER BY r.id ASC;
+";
 
+$stmt = $con->prepare($sql);
+$stmt->bindParam(':today', $today);
 
+$stmt->execute();
 ?>
 
+<table border="1" cellpadding="5" style="margin: 0 auto; border-collapse: collapse; text-align: center;">
+  <tr style="background-color: #f0f0f0;">
+    <th style="width: 6%;">Emp ID</th>
+    <th style="width: 25%;">Name</th>
+    <th style="width: 6%;">User Type</th>
+    <th style="width: 11%;">Last Activity</th>
+    <th style="width: 6%;">Date Logs</th>
+    <th style="width: 4%;">Sched Code</th>
+    <th style="background-color: blue; color: white; width: 7%;">Time In</th>
+    <th style="background-color: darkred; color: white; width: 7%;">Time Out</th>
+    <th style="background-color: blue; color: white; width: 7%;">Break In</th>
+    <th style="background-color: darkred; color: white; width: 7%;">Break Out</th>
+    <th style="background-color: blue; color: white; width: 7%;">Lunch In</th>
+    <th style="background-color: darkred; color: white; width: 7%;">Lunch Out</th>
+    <th style="background-color: green; color: white; width: 5%;">Status</th>
+  </tr>
 
-   <table border="1" cellpadding="5" style="margin: 0 auto; border-collapse: collapse; text-align: center;">
-     <tr style="background-color: #f0f0f0;">
-       <th style="width: 6%;">Emp ID</th>
-       <th style="width: 20%;">Name</th>
-       <th style="width: 6%;">User Type</th>
-       <th style="width: 11%;">Last Activity</th>
-       <th style="width: 6%;">Date Logs</th>
-       <th style="width: 4%;">Sched Code</th>
-       <th style="background-color: blue; color: white; width: 7%;">Time In</th>
-       <th style="background-color: darkred; color: white; width: 7%;">Time Out</th>
-       <th style="background-color: blue; color: white; width: 7%;">Break In</th>
-       <th style="background-color: darkred; color: white; width: 7%;">Break Out</th>
-       <th style="background-color: blue; color: white; width: 7%;">Lunch In</th>
-       <th style="background-color: darkred; color: white; width: 7%;">Lunch Out</th>
-       <th style="background-color: green; color: white; width: 5%;">Status</th>
-     </tr>
+  <?php while ($row = $stmt->fetch(PDO::FETCH_ASSOC)): ?>
+    <?php
+    $punch_in  = formatTime($row['punch_in']);
+    $punch_out = formatTime($row['punch_out']);
+    $break_in  = formatTime($row['break_in']);
+    $break_out = formatTime($row['break_out']);
+    $lunch_in  = formatTime($row['lunch_in']);
+    $lunch_out = formatTime($row['lunch_out']);
+    ?>
+    <tr>
+      <td><?= htmlspecialchars($row['emp_id']) ?></td>
+      <td><?= htmlspecialchars($row['fullname']) ?></td>
+      <td><?= htmlspecialchars($row['user_type']) ?></td>
+      <td><?= htmlspecialchars($row['last_activity']) ?></td>
+      <td><?= htmlspecialchars($row['date_logs']) ?></td>
+      <td><?= htmlspecialchars($row['schedule_code']) ?></td>
+      <td><?= $punch_in ?></td>
+      <td><?= $punch_out ?></td>
+      <td><?= $break_in ?></td>
+      <td><?= $break_out ?></td>
+      <td><?= $lunch_in ?></td>
+      <td><?= $lunch_out ?></td>
+      <td style="color: <?= $row['current_status'] === 'online' ? 'green' : 'red' ?>;">
+        <?= ucfirst($row['current_status']) ?>
+      </td>
+    </tr>
+  <?php endwhile; ?>
+</table>
 
-     <?php foreach ($day_shift as $row): ?>
-       <?php
-        $punch_in  = formatTime($row['punch_in']);
-        $punch_out = formatTime($row['punch_out']);
-        $break_in  = formatTime($row['break_in']);
-        $break_out = formatTime($row['break_out']);
-        $lunch_in  = formatTime($row['lunch_in']);
-        $lunch_out = formatTime($row['lunch_out']);
-        ?>
-       <tr>
-         <td><?= htmlspecialchars($row['emp_id']) ?></td>
-         <td><?= htmlspecialchars($row['fullname']) ?></td>
-         <td><?= htmlspecialchars($row['user_type']) ?></td>
-         <td><?= htmlspecialchars($row['last_activity']) ?></td>
-         <td><?= htmlspecialchars($row['date_logs']) ?></td>
-         <td><?= htmlspecialchars($row['schedule_code']) ?></td>
-         <td><?= $punch_in ?></td>
-         <td><?= $punch_out ?></td>
-         <td><?= $break_in ?></td>
-         <td><?= $break_out ?></td>
-         <td><?= $lunch_in ?></td>
-         <td><?= $lunch_out ?></td>
-         <td style="color: <?= $row['current_status'] === 'online' ? 'green' : 'red' ?>;">
-           <?= ucfirst($row['current_status']) ?>
-         </td>
-       </tr>
-     <?php endforeach; ?>
-   </table>
-
-
-
-<br>
-<br>
-
-<!-- 
-<script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
-
-<script>
-$(document).ready(function() {
-    // Reload table every 5 seconds (5000ms)
-    setInterval(function() {
-        $('#attendanceTable').load('table_dayshift.php');
-    }, 5000);
-});
-</script> -->
