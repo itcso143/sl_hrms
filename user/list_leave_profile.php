@@ -115,7 +115,7 @@ $get_view_data->execute();
 
                                     <div class="col-lg-3 col-md-4 col-sm-6">
                                         <div class="mb-3">
-                                            <label for="emp_leave_balance" class="form-label">Leave Credits</label>
+                                            <label for="emp_leave_balance" class="form-label">Sick Leave Credits</label>
                                             <input readonly type="text" class="form-control" id="emp_leave_balance" name="emp_leave_balance" placeholder="">
                                         </div>
                                     </div>
