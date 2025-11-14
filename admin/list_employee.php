@@ -1,4 +1,3 @@
-
 <?php
 
 include('../config/db_config.php');
@@ -173,7 +172,7 @@ $get_emp_netpay_data->execute();
 
           <!-- Leave Modal -->
           <div class="modal fade" id="modal_leave" tabindex="-1" aria-labelledby="addLeaveModalLabel" aria-hidden="true">
-            <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-dialog modal-dialog-centered" style="max-width: 900px;">
               <div class="modal-content">
 
                 <!-- Modal Header -->
@@ -193,9 +192,19 @@ $get_emp_netpay_data->execute();
                         <input readonly type="text" name="emp_id_leave" id="emp_id_leave" class="form-control">
                       </div>
 
-                      <div class="col-lg-5">
-                        <label for="emp_leave_balance">Leave Credits Balance:</label>
+                    </div>
+                    <br>
+
+                    <div class="row">
+
+                      <div class="col-lg-6">
+                        <label for="emp_leave_balance">Sick Leave Credits Balance:</label>
                         <input readonly type="text" name="emp_leave_balance" id="emp_leave_balance" class="form-control">
+                      </div>
+
+                      <div class="col-lg-6">
+                        <label for="emp_vacation_balance">Vacation Credits Balance:</label>
+                        <input readonly type="text" name="emp_vacation_balance" id="emp_vacation_balance" class="form-control">
                       </div>
                     </div>
 
@@ -204,22 +213,29 @@ $get_emp_netpay_data->execute();
 
                     <div class="row">
 
-                      <div class="col-lg-7">
-                        <label for="emp_new_credits">Add New Credits:</label>
+                      <div class="col-lg-6">
+                        <label for="emp_new_credits">Add Leave Credits:</label>
                         <input type="text" name="emp_new_credits" id="emp_new_credits" class="form-control">
                       </div>
+
+
+                      <div class="col-lg-6">
+                        <label for="emp_vacation_credits">Add Vacation Credits:</label>
+                        <input type="text" name="emp_vacation_credits" id="emp_vacation_credits" class="form-control">
+                      </div>
                     </div>
+                  </div>
 
-                    <br>
+                  <br>
 
 
 
 
-                    <!-- Modal Footer -->
-                    <div class="modal-footer">
-                      <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                      <input type="submit" name="update_emp_leavecredits" class="btn btn-primary" value="Update">
-                    </div>
+                  <!-- Modal Footer -->
+                  <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <input type="submit" name="update_emp_leavecredits" class="btn btn-primary" value="Update">
+                  </div>
                 </form>
 
               </div>
@@ -1040,28 +1056,52 @@ $get_emp_netpay_data->execute();
 
 
 
-    $.ajax({
-    url: 'get_emp_leavecredits.php', // your PHP script
-    type: 'POST',
-    dataType: 'json',
-    data: {
-        emp_id_leave: emp_id
-    },
-    success: function(response) {
-        if (response.success) {
-            // Use leave_balance from response.data
-            var leaveBalance = response.data.leave_balance;
-            $('#emp_leave_balance').val(leaveBalance);
-        } else {
-            alert(response.message);
-            $('#emp_leave_balance').val('0');
-        }
-    },
-    error: function(xhr, status, error) {
-        console.error('AJAX Error:', error);
-        $('#emp_leave_balance').val('0'); // set 0 on error
-    }
-});
+        $.ajax({
+          url: 'get_emp_leavecredits.php', // your PHP script
+          type: 'POST',
+          dataType: 'json',
+          data: {
+            emp_id_leave: emp_id
+          },
+          success: function(response) {
+            if (response.success) {
+              // Use leave_balance from response.data
+              var leaveBalance = response.data.leave_balance;
+              $('#emp_leave_balance').val(leaveBalance);
+            } else {
+              alert(response.message);
+              $('#emp_leave_balance').val('0');
+            }
+          },
+          error: function(xhr, status, error) {
+            console.error('AJAX Error:', error);
+            $('#emp_leave_balance').val('0'); // set 0 on error
+          }
+        });
+
+
+           $.ajax({
+          url: 'get_emp_vacationcredits.php', // your PHP script
+          type: 'POST',
+          dataType: 'json',
+          data: {
+            emp_id_leave: emp_id
+          },
+          success: function(response) {
+            if (response.success) {
+              // Use leave_balance from response.data
+              var leaveBalance = response.data.vacation_balance;
+              $('#emp_vacation_balance').val(leaveBalance);
+            } else {
+              alert(response.message);
+              $('#emp_vacation_balance').val('0');
+            }
+          },
+          error: function(xhr, status, error) {
+            console.error('AJAX Error:', error);
+            $('#emp_vacation_balance').val('0'); // set 0 on error
+          }
+        });
 
 
 

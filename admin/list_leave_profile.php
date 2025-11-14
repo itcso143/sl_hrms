@@ -248,10 +248,29 @@ $get_view_data->execute();
 
                                             <div class="col-lg-4 col-md-4 col-sm-6">
                                                 <div class="mb-3">
-                                                    <label for="leave_credits_view" class="form-label">Leave Credits</label>
-                                                    <input readonly type="text" class="form-control" id="leave_credits_view" name="leave_credits_view" placeholder="">
+                                                    <label for="leave_sick_balance" class="form-label">Sick Leave Credits</label>
+                                                    <input readonly type="text" class="form-control" id="leave_sick_balance" name="leave_sick_balance" placeholder="">
                                                 </div>
                                             </div>
+
+                                            <div class="col-lg-4 col-md-4 col-sm-6">
+                                                <div class="mb-3">
+                                                    <label for="leave_vacation_balance" class="form-label">Vacation Leave Credits</label>
+                                                    <input readonly type="text" class="form-control" id="leave_vacation_balance" name="leave_vacation_balance" placeholder="">
+                                                </div>
+                                            </div>
+
+
+                                        </div>
+
+                                        <div class="row g-3">
+                                            <div class="col-lg-3 col-md-4 col-sm-6">
+                                                <div class="mb-3">
+                                                    <label for="leave_deduction_view" class="form-label">Leave Deduction:</label>
+                                                    <input readonly type="text" class="form-control" id="leave_deduction_view" name="leave_deduction_view" value="">
+                                                </div>
+                                            </div>
+
 
 
                                         </div>
@@ -639,7 +658,56 @@ $get_view_data->execute();
             $('#date_from_view').val(date_from);
             $('#date_to_view').val(date_to);
             $('#leave_reason_view').val(leave_reason_view);
-            $('#leave_credits_view').val(leave_credits_view);
+            $('#leave_deduction_view').val(leave_credits_view);
+
+
+            $.ajax({
+                url: 'get_emp_leavecredits.php', // your PHP script
+                type: 'POST',
+                dataType: 'json',
+                data: {
+                    emp_id_leave: emp_id
+                },
+                success: function(response) {
+                    if (response.success) {
+                        // Use leave_balance from response.data
+                        var leaveBalance = response.data.leave_balance;
+                        $('#leave_sick_balance').val(leaveBalance);
+                    } else {
+                        alert(response.message);
+                        $('#leave_sick_balance').val('0');
+                    }
+                },
+                error: function(xhr, status, error) {
+                    console.error('AJAX Error:', error);
+                    $('#leave_sick_balance').val('0'); // set 0 on error
+                }
+            });
+
+
+            $.ajax({
+                url: 'get_emp_vacationcredits.php', // your PHP script
+                type: 'POST',
+                dataType: 'json',
+                data: {
+                    emp_id_leave: emp_id
+                },
+                success: function(response) {
+                    if (response.success) {
+                        // Use leave_balance from response.data
+                        var leaveBalance = response.data.vacation_balance;
+                        $('#leave_vacation_balance').val(leaveBalance);
+                    } else {
+                        alert(response.message);
+                        $('#leave_vacation_balance').val('0');
+                    }
+                },
+                error: function(xhr, status, error) {
+                    console.error('AJAX Error:', error);
+                    $('#leave_vacation_balance').val('0'); // set 0 on error
+                }
+            });
+
 
 
         });

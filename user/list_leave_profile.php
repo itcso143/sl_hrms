@@ -87,16 +87,129 @@ $get_view_data->execute();
         <?php echo "$alert_msg1"; ?>
       </div> -->
 
+            <!-- Add New LEAVE Modal -->
+            <div class="modal fade" id="add_leaveModal" tabindex="-1" aria-labelledby="v" aria-hidden="true">
 
+                <div class="modal-dialog modal-dialog" style="max-width: 900px; width: 90%;">
+
+                    <div class="modal-content">
+                        <div class="modal-header bg-success text-white">
+                            <h5 class="modal-title" id="addPayrollModalLabel">Create Leave</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <!-- Your form or content goes here -->
+                            <form method="post" enctype="multipart/form-data" action="insert_employee_leave.php">
+
+
+
+
+                                <br>
+                                <div class="row g-3">
+                                    <div class="col-lg-3 col-md-4 col-sm-6">
+                                        <div class="mb-3">
+                                            <label for="emp_id_leave" class="form-label">Emp ID:</label>
+                                            <input readonly type="text" class="form-control" id="emp_id_leave" name="emp_id_leave" value="<?php echo $emp_id_; ?>">
+                                        </div>
+                                    </div>
+
+                                    <div class="col-lg-3 col-md-4 col-sm-6">
+                                        <div class="mb-3">
+                                            <label for="emp_leave_balance" class="form-label">Leave Credits</label>
+                                            <input readonly type="text" class="form-control" id="emp_leave_balance" name="emp_leave_balance" placeholder="">
+                                        </div>
+                                    </div>
+
+                                    <div class="col-lg-3 col-md-4 col-sm-6">
+                                        <div class="mb-3">
+                                            <label for="vacation_credits" class="form-label">Vacation Credits</label>
+                                            <input readonly type="text" class="form-control" id="vacation_credits" name="vacation_credits" placeholder="">
+                                        </div>
+                                    </div>
+
+
+                                </div>
+
+                                <div class="row g-3">
+                                    <div class="col-lg-12 col-md-4 col-sm-6">
+                                        <div class="mb-3">
+                                            <label for="fullname" class="form-label">Name:</label>
+                                            <input readonly type="text" class="form-control" id="fullname" name="fullname" value="<?php echo $emp_fullname; ?>">
+                                        </div>
+                                    </div>
+
+
+
+
+                                </div>
+
+
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <label for="get_leave">Select Type of Leave</label>
+                                        <select class="form-control select2" id="get_leave" name="get_leave">
+                                            <?php while ($get_leave = $get_leave_data->fetch(PDO::FETCH_ASSOC)) {
+                                                $selected = ($get_user_leave == $get_leave['leave_code']) ? 'selected' : '';
+                                            ?>
+                                                <option <?= $selected; ?> value="<?= $get_leave['leave_code']; ?>">
+                                                    <?= $get_leave['leave_code']; ?> -
+                                                    <?= $get_leave['leave']; ?>
+                                                </option>
+                                            <?php } ?>
+                                        </select>
+                                    </div>
+                                </div>
+                                <br>
+
+
+                                <div class="row">
+                                    <div class="col-lg-6">
+                                        <label for="date_from">Date from:</label>
+                                        <input type="date" name="date_from" id="date_from" class="form-control" required>
+                                    </div>
+
+                                    <div class="col-lg-6">
+                                        <label for="date_to">Date to:</label>
+                                        <input type="date" name="date_to" id="date_to" class="form-control" required>
+                                    </div>
+                                </div>
+
+
+                                <br>
+                                <div class="col-lg-12 col-md-4 col-sm-6">
+                                    <div class="mb-3">
+                                        <label for="leave_reason" class="form-label">Reason for Leave:</label>
+                                        <input type="text" class="form-control" id="leave_reason" name="leave_reason" placeholder="">
+                                    </div>
+                                </div>
+
+                                <label for="file">Choose a file or image:</label>
+                                <input type="file" name="file" id="file" required>
+
+                        </div>
+
+                        <!-- Modal Footer -->
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                            <input type="submit" name="insert_employee_leave" class="btn btn-primary" value="Submit">
+                        </div>
+
+
+                    </div>
+
+                    </form>
+                </div>
+            </div>
             <section class="content">
                 <div class="card card-info">
                     <div class="card-header  text-white bg-dark">
 
+                        <input hidden type="text" class="form-control" id="emp_id_balance" name="emp_id_balance" value="<?php echo $emp_id_; ?>">
 
                         <div class="card-header  text-white bg-dark">
                             <h4> List Leave
 
-                                <a id="add_employee"
+                                <a id="add_leaveModal_btn"
                                     type="button"
                                     class="btn btn-primary bg-gradient-success"
                                     style="float: right; border-radius: 0px;"
@@ -112,112 +225,7 @@ $get_view_data->execute();
 
                     </div>
 
-                    <!-- Add New LEAVE Modal -->
-                    <div class="modal fade" id="add_leaveModal" tabindex="-1" aria-labelledby="v" aria-hidden="true">
 
-                        <div class="modal-dialog modal-dialog" style="max-width: 900px; width: 90%;">
-
-                            <div class="modal-content">
-                                <div class="modal-header bg-success text-white">
-                                    <h5 class="modal-title" id="addPayrollModalLabel">Create Leave</h5>
-                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                </div>
-                                <div class="modal-body">
-                                    <!-- Your form or content goes here -->
-                                    <form method="post" enctype="multipart/form-data" action="insert_employee_leave.php">
-
-
-
-
-                                        <br>
-                                        <div class="row g-3">
-                                            <div class="col-lg-3 col-md-4 col-sm-6">
-                                                <div class="mb-3">
-                                                    <label for="emp_id_leave" class="form-label">Emp ID:</label>
-                                                    <input readonly type="text" class="form-control" id="emp_id_leave" name="emp_id_leave" value="<?php echo $emp_id_; ?>">
-                                                </div>
-                                            </div>
-
-                                            <div class="col-lg-4 col-md-4 col-sm-6">
-                                                <div class="mb-3">
-                                                    <label for="leave_creadits" class="form-label">Leave Credits</label>
-                                                    <input readonly type="text" class="form-control" id="leave_creadits" name="leave_creadits" placeholder="">
-                                                </div>
-                                            </div>
-
-
-                                        </div>
-
-                                        <div class="row g-3">
-                                            <div class="col-lg-12 col-md-4 col-sm-6">
-                                                <div class="mb-3">
-                                                    <label for="fullname" class="form-label">Name:</label>
-                                                    <input readonly type="text" class="form-control" id="fullname" name="fullname" value="<?php echo $emp_fullname; ?>">
-                                                </div>
-                                            </div>
-
-
-
-
-                                        </div>
-
-
-                                        <div class="row">
-                                            <div class="col-md-12">
-                                                <label for="get_leave">Select Type of Leave</label>
-                                                <select class="form-control select2" id="get_leave" name="get_leave">
-                                                    <?php while ($get_leave = $get_leave_data->fetch(PDO::FETCH_ASSOC)) {
-                                                        $selected = ($get_user_leave == $get_leave['leave_code']) ? 'selected' : '';
-                                                    ?>
-                                                        <option <?= $selected; ?> value="<?= $get_leave['leave_code']; ?>">
-                                                            <?= $get_leave['leave_code']; ?> -
-                                                            <?= $get_leave['leave']; ?>
-                                                        </option>
-                                                    <?php } ?>
-                                                </select>
-                                            </div>
-                                        </div>
-                                        <br>
-
-
-                                        <div class="row">
-                                            <div class="col-lg-6">
-                                                <label for="date_from">Date from:</label>
-                                                <input type="date" name="date_from" id="date_from" class="form-control" required>
-                                            </div>
-
-                                            <div class="col-lg-6">
-                                                <label for="date_to">Date to:</label>
-                                                <input type="date" name="date_to" id="date_to" class="form-control" required>
-                                            </div>
-                                        </div>
-
-
-                                        <br>
-                                        <div class="col-lg-12 col-md-4 col-sm-6">
-                                            <div class="mb-3">
-                                                <label for="leave_reason" class="form-label">Reason for Leave:</label>
-                                                <input type="text" class="form-control" id="leave_reason" name="leave_reason" placeholder="">
-                                            </div>
-                                        </div>
-
-                                        <label for="file">Choose a file or image:</label>
-                                        <input type="file" name="file" id="file" required>
-
-                                </div>
-
-                                <!-- Modal Footer -->
-                                <div class="modal-footer">
-                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                                    <input type="submit" name="insert_employee_leave" class="btn btn-primary" value="Submit">
-                                </div>
-
-
-                            </div>
-
-                            </form>
-                        </div>
-                    </div>
 
                     <!-- Add View Leave Modal -->
                     <div class="modal fade" id="modal_leave" tabindex="-1" aria-labelledby="v" aria-hidden="true">
@@ -245,7 +253,9 @@ $get_view_data->execute();
                                                 </div>
                                             </div>
 
-                                            <div class="col-lg-4 col-md-4 col-sm-6">
+
+
+                                            <div class="col-lg-3 col-md-4 col-sm-6">
                                                 <div class="mb-3">
                                                     <label for="leave_creadits_view" class="form-label">Leave Credits</label>
                                                     <input readonly type="text" class="form-control" id="leave_creadits_view" name="leave_creadits_view" placeholder="">
@@ -636,6 +646,96 @@ $get_view_data->execute();
             $('#date_from_view').val(date_from);
             $('#date_to_view').val(date_to);
 
+
+
+            $.ajax({
+                url: 'get_emp_leavecredits.php', // your PHP script
+                type: 'POST',
+                dataType: 'json',
+                data: {
+                    emp_id_leave: emp_id
+                },
+                success: function(response) {
+                    if (response.success) {
+                        // Use leave_balance from response.data
+                        var leaveBalance = response.data.leave_balance;
+                        $('#emp_leave_balance').val(leaveBalance);
+                    } else {
+                        alert(response.message);
+                        $('#emp_leave_balance').val('0');
+                    }
+                },
+                error: function(xhr, status, error) {
+                    console.error('AJAX Error:', error);
+                    $('#emp_leave_balance').val('0'); // set 0 on error
+                }
+            });
+
+        });
+
+
+
+        $(document).ready(function() {
+
+            // Use a proper click handler
+            $(document).on("click", "#add_leaveModal_btn", function(event) {
+                event.preventDefault();
+
+                var currow = $(this).closest("tr");
+                var emp_id = $('#emp_id_balance').val();
+
+                console.log("test");
+
+                // Show modal
+                $('#add_leaveModal').modal('show');
+                $('#emp_id_leave').val(emp_id);
+
+                // AJAX request
+                $.ajax({
+                    url: 'get_emp_leavecredits.php',
+                    type: 'POST',
+                    dataType: 'json',
+                    data: {
+                        emp_id_leave: emp_id
+                    },
+                    success: function(response) {
+                        if (response.success) {
+                            var leaveBalance = response.data.leave_balance;
+                            $('#emp_leave_balance').val(leaveBalance);
+                        } else {
+                            alert(response.message);
+                            $('#emp_leave_balance').val('0');
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        console.error('AJAX Error:', error);
+                        $('#emp_leave_balance').val('0');
+                    }
+                });
+
+
+                    $.ajax({
+                    url: 'get_emp_vacationcredits.php',
+                    type: 'POST',
+                    dataType: 'json',
+                    data: {
+                        emp_id_leave: emp_id
+                    },
+                    success: function(response) {
+                        if (response.success) {
+                            var vacationBalance = response.data.vacation_balance;
+                            $('#vacation_credits').val(vacationBalance);
+                        } else {
+                            alert(response.message);
+                            $('#vacation_credits').val('0');
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        console.error('AJAX Error:', error);
+                        $('#vacation_credits').val('0');
+                    }
+                });
+            });
 
         });
     </script>
