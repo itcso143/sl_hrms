@@ -325,7 +325,8 @@ $get_view_data->execute();
                                         <div class="col-lg-12 col-md-4 col-sm-6">
                                             <div class="mb-3">
                                                 <label for="leave_reason_view" class="form-label">Reason for Leave:</label>
-                                                <input type="text" class="form-control" id="leave_reason_view" name="leave_reason_view" placeholder="">
+                                                <textarea class="form-control" id="leave_reason_view" name="leave_reason_view" placeholder="" rows="4"></textarea>
+
                                             </div>
                                         </div>
 
