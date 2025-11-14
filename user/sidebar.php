@@ -570,10 +570,32 @@ while ($result4 = $user_data->fetch(PDO::FETCH_ASSOC)) {
 
         </ul>
 
+   </li>
+
+
+     <li class="nav-item has-treeview">
+        <a href="#" class="nav-link">
+          <i class="nav-icon fa fa-folder"></i>
+          <p>
+            FILE LEAVE
+            <i class="right fa fa-angle-left"></i>
+          </p>
+        </a>
+
+        <ul class="nav nav-treeview">
+
+          <li class="nav-item">
+            <a href="list_leave_profile" class="nav-link">
+              <i class="fa fa-file nav-icon"></i>
+              <p>Create Leave</p>
+            </a>
+          </li>
 
 
 
+        </ul>
 
+   </li>
 
 
       <li class="nav-item has-treeview">

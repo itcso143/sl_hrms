@@ -25,12 +25,12 @@ SELECT
     t.today_punch_in,
     t.today_punch_out,
     t.yesterday_punch_in,
-    t.break_in,
-    t.break_out,
-    t.lunch_in,
-    t.lunch_out,
-    t.schedule_code,
-    t.date_logs,
+    t.today_break_in,
+    t.today_break_out,
+    t.today_lunch_in,
+    t.today_lunch_out,
+    t.today_schedule_code,
+    t.today_date_logs,
     IF(
         r.last_activity IS NULL, 
         'offline',
@@ -44,17 +44,18 @@ LEFT JOIN (
         MIN(CASE WHEN DATE(date_logs) = :today THEN punch_in END) AS today_punch_in,
         MAX(CASE WHEN DATE(date_logs) = :today THEN punch_out END) AS today_punch_out,
         MIN(CASE WHEN DATE(date_logs) = :yesterday AND TIME(punch_in) >= '20:00:00' THEN punch_in END) AS yesterday_punch_in,
-        MAX(break_in) AS break_in,
-        MAX(break_out) AS break_out,
-        MAX(lunch_in) AS lunch_in,
-        MAX(lunch_out) AS lunch_out,
-        MAX(schedule_code) AS schedule_code,
-        MAX(date_logs) AS date_logs
+        MAX(CASE WHEN DATE(date_logs) = :today THEN break_in END) AS today_break_in,
+        MAX(CASE WHEN DATE(date_logs) = :today THEN break_out END) AS today_break_out,
+        MAX(CASE WHEN DATE(date_logs) = :today THEN lunch_in END) AS today_lunch_in,
+        MAX(CASE WHEN DATE(date_logs) = :today THEN lunch_out END) AS today_lunch_out,
+        MAX(CASE WHEN DATE(date_logs) = :today THEN schedule_code END) AS today_schedule_code,
+        MAX(CASE WHEN DATE(date_logs) = :today THEN date_logs END) AS today_date_logs
+       
     FROM tbl_employee_timelogs
     WHERE DATE(date_logs) IN (:today, :yesterday)
     GROUP BY emp_id
 ) t ON t.emp_id = r.emp_id
- WHERE t.schedule_code='F5' ORDER BY r.id ASC";
+ WHERE t.today_schedule_code='F5' ORDER BY r.id ASC";
 
 $stmt = $con->prepare($sql);
 $stmt->bindParam(':today', $today);
@@ -85,18 +86,18 @@ $stmt->execute();
         $today_punch_in     = formatTime($row['today_punch_in']);
         $today_punch_out    = formatTime($row['today_punch_out']);
         $yesterday_punch_in = formatTime($row['yesterday_punch_in']);
-        $break_in  = formatTime($row['break_in']);
-        $break_out = formatTime($row['break_out']);
-        $lunch_in  = formatTime($row['lunch_in']);
-        $lunch_out = formatTime($row['lunch_out']);
+        $break_in  = formatTime($row['today_break_in']);
+        $break_out = formatTime($row['today_break_out']);
+        $lunch_in  = formatTime($row['today_lunch_in']);
+        $lunch_out = formatTime($row['today_lunch_out']);
         ?>
         <tr>
             <td><?= htmlspecialchars($row['emp_id']) ?></td>
             <td><?= htmlspecialchars($row['fullname']) ?></td>
             <td><?= htmlspecialchars($row['user_type']) ?></td>
             <td><?= htmlspecialchars($row['last_activity']) ?></td>
-            <td><?= htmlspecialchars($row['date_logs']) ?></td>
-            <td><?= htmlspecialchars($row['schedule_code']) ?></td>
+            <td><?= htmlspecialchars($row['today_date_logs']) ?></td>
+            <td><?= htmlspecialchars($row['today_schedule_code']) ?></td>
             <td><?= htmlspecialchars($yesterday_punch_in) ?></td>
             <td><?= $today_punch_in ?></td>
             <td><?= $today_punch_out ?></td>
