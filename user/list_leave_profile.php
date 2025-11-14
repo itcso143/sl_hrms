@@ -179,7 +179,8 @@ $get_view_data->execute();
                                 <div class="col-lg-12 col-md-4 col-sm-6">
                                     <div class="mb-3">
                                         <label for="leave_reason" class="form-label">Reason for Leave:</label>
-                                        <input type="text" class="form-control" id="leave_reason" name="leave_reason" placeholder="">
+                                        <textarea class="form-control" id="leave_reason" name="leave_reason" placeholder="" rows="4"></textarea>
+
                                     </div>
                                 </div>
 
@@ -578,23 +579,23 @@ $get_view_data->execute();
     `
             }]
 
-    //   <div class="dropdown">
-    //     <button 
-    //       class="btn btn-sm btn-primary dropdown-toggle" 
-    //       type="button" 
-    //       data-bs-toggle="dropdown" 
-    //       aria-expanded="false">
-    //       Actions
-    //     </button>
-    //     <ul class="dropdown-menu">
-      
-    //         <li>
-    //     <a class="dropdown-item" id="modal_leave" href="#" title="View Leave" data-bs-toggle="modal" data-bs-target="#addSalaryModal">
-    //        <i class="fa fa-folder"></i> View Leave
-    //       </a>
-    //       </li>
-    //     </ul>
-    //   </div>
+            //   <div class="dropdown">
+            //     <button 
+            //       class="btn btn-sm btn-primary dropdown-toggle" 
+            //       type="button" 
+            //       data-bs-toggle="dropdown" 
+            //       aria-expanded="false">
+            //       Actions
+            //     </button>
+            //     <ul class="dropdown-menu">
+
+            //         <li>
+            //     <a class="dropdown-item" id="modal_leave" href="#" title="View Leave" data-bs-toggle="modal" data-bs-target="#addSalaryModal">
+            //        <i class="fa fa-folder"></i> View Leave
+            //       </a>
+            //       </li>
+            //     </ul>
+            //   </div>
             // <li>
             //   <a class="dropdown-item" id="modal_schedule" href="#" title="Add Schedule" data-bs-toggle="modal" data-bs-target="#addScheduleModal">
             //     <i class="fa fa-calendar"></i> Add Schedule
@@ -714,7 +715,7 @@ $get_view_data->execute();
                 });
 
 
-                    $.ajax({
+                $.ajax({
                     url: 'get_emp_vacationcredits.php',
                     type: 'POST',
                     dataType: 'json',
