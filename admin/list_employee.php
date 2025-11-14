@@ -1,3 +1,4 @@
+
 <?php
 
 include('../config/db_config.php');
@@ -163,6 +164,62 @@ $get_emp_netpay_data->execute();
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
                     <input type="submit" name="update_employee_schedule" class="btn btn-primary" value="Update Schedule">
                   </div>
+                </form>
+
+              </div>
+            </div>
+          </div>
+
+
+          <!-- Leave Modal -->
+          <div class="modal fade" id="modal_leave" tabindex="-1" aria-labelledby="addLeaveModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+              <div class="modal-content">
+
+                <!-- Modal Header -->
+                <div class="modal-header bg-primary text-white">
+                  <h5 class="modal-title" id="addLeaveModalLabel">
+                    <i class="fa fa-plus"></i> Add Leave Credits
+                  </h5>
+                  <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+
+                <!-- Modal Body -->
+                <form method="POST" action="update_emp_leavecredits.php">
+                  <div class="modal-body">
+                    <div class="row">
+                      <div class="col-lg-5">
+                        <label for="emp_id_leave">EMP ID:</label>
+                        <input readonly type="text" name="emp_id_leave" id="emp_id_leave" class="form-control">
+                      </div>
+
+                      <div class="col-lg-5">
+                        <label for="emp_leave_balance">Leave Credits Balance:</label>
+                        <input readonly type="text" name="emp_leave_balance" id="emp_leave_balance" class="form-control">
+                      </div>
+                    </div>
+
+                    <br>
+
+
+                    <div class="row">
+
+                      <div class="col-lg-7">
+                        <label for="emp_new_credits">Add New Credits:</label>
+                        <input type="text" name="emp_new_credits" id="emp_new_credits" class="form-control">
+                      </div>
+                    </div>
+
+                    <br>
+
+
+
+
+                    <!-- Modal Footer -->
+                    <div class="modal-footer">
+                      <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                      <input type="submit" name="update_emp_leavecredits" class="btn btn-primary" value="Update">
+                    </div>
                 </form>
 
               </div>
@@ -843,6 +900,9 @@ $get_emp_netpay_data->execute();
           </a>
           </li>
 
+       
+          
+
         <li>
         <a class="dropdown-item" id="modal_payslip" href="#" title="Payslip" data-bs-toggle="modal" data-bs-target="#addPayslipModal">
            <i class="fa fa-file"></i> Payslip
@@ -852,6 +912,12 @@ $get_emp_netpay_data->execute();
           <li>
         <a class="dropdown-item" id="modal_schedule" href="#" title="Add Schedule" data-bs-toggle="modal" data-bs-target="#addScheduleModal">
            <i class="fa fa-calendar"></i> Add Schedule
+          </a>
+          </li>
+
+           <li>
+        <a class="dropdown-item" id="modal_leave" href="#" title="Add Leave Credits" data-bs-toggle="modal" data-bs-target="#addLeaveModal">
+           <i class="fa fa-plus"></i> Add Leave Credits
           </a>
           </li>
 
@@ -940,10 +1006,8 @@ $get_emp_netpay_data->execute();
         var currow = $(this).closest("tr");
 
         var emp_id = currow.find("td:eq(0)").text();
-        var entity_no = currow.find("td:eq(1)").text();
+
         var fullname = currow.find("td:eq(2)").text();
-        var address = currow.find("td:eq(3)").text();
-        var barangay = currow.find("td:eq(4)").text();
 
 
 
@@ -955,6 +1019,49 @@ $get_emp_netpay_data->execute();
         $('#fullname1').val(fullname);
 
 
+
+
+
+      });
+
+      $("#users tbody").on("click", "#modal_leave", function() {
+        event.preventDefault();
+        var currow = $(this).closest("tr");
+
+        var emp_id = currow.find("td:eq(0)").text();
+        var fullname = currow.find("td:eq(2)").text();
+
+
+        console.log("test");
+        $('#modal_leave').modal('show');
+        $('#emp_id_leave').val(emp_id);
+
+        $('#fullname1_leave').val(fullname);
+
+
+
+    $.ajax({
+    url: 'get_emp_leavecredits.php', // your PHP script
+    type: 'POST',
+    dataType: 'json',
+    data: {
+        emp_id_leave: emp_id
+    },
+    success: function(response) {
+        if (response.success) {
+            // Use leave_balance from response.data
+            var leaveBalance = response.data.leave_balance;
+            $('#emp_leave_balance').val(leaveBalance);
+        } else {
+            alert(response.message);
+            $('#emp_leave_balance').val('0');
+        }
+    },
+    error: function(xhr, status, error) {
+        console.error('AJAX Error:', error);
+        $('#emp_leave_balance').val('0'); // set 0 on error
+    }
+});
 
 
 
@@ -1043,7 +1150,7 @@ $get_emp_netpay_data->execute();
 
 
 
-         $('#emp_ot_quantity, #emp_ot_rate').on('input', function() {
+        $('#emp_ot_quantity, #emp_ot_rate').on('input', function() {
           const qty = parseFloat($('#emp_ot_quantity').val()) || 0;
           const rate = parseFloat($('#emp_ot_rate').val()) || 0;
           const total = qty * rate;
@@ -1053,7 +1160,7 @@ $get_emp_netpay_data->execute();
           $('#emp_ot_total').trigger('input');
         });
 
-          $('#emp_bonus_quantity, #emp_bonus_rate').on('input', function() {
+        $('#emp_bonus_quantity, #emp_bonus_rate').on('input', function() {
           const qty = parseFloat($('#emp_bonus_quantity').val()) || 0;
           const rate = parseFloat($('#emp_bonus_rate').val()) || 0;
           const total = qty * rate;
@@ -1062,7 +1169,7 @@ $get_emp_netpay_data->execute();
           // 👇 Trigger recalculation of Net Pay (from your earlier script)
           $('#emp_bonus_total').trigger('input');
         });
-        
+
         $('#emp_quantity_absences, #emp_rate_absences').on('input', function() {
           const qty = parseFloat($('#emp_quantity_absences').val()) || 0;
           const rate = parseFloat($('#emp_rate_absences').val()) || 0;
@@ -1122,10 +1229,10 @@ $get_emp_netpay_data->execute();
                 var bonus = parseFloat($('#emp_bonus_total').val()) || 0;
 
                 var totalDeduction = late + absences + hrmo;
-            
 
-                 var totalAddition = overtime + bonus;
-                  var newNetPay = baseNetPay - totalDeduction + totalAddition;
+
+                var totalAddition = overtime + bonus;
+                var newNetPay = baseNetPay - totalDeduction + totalAddition;
 
                 $('#netpay').val(newNetPay >= 0 ? newNetPay : 0);
               }
