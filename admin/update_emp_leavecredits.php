@@ -70,9 +70,7 @@ if (isset($_POST['update_emp_leavecredits'])) {
     }
 
 
-    /* ---------------------------
-       SET APPROPRIATE STATUS MESSAGE
-    -----------------------------*/
+        
     if ($success) {
         $_SESSION['status'] = "Leave Balance Updated Successfully!";
         $_SESSION['status_code'] = "success";
