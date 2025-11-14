@@ -614,7 +614,7 @@ $get_view_data->execute();
 
         });
 
-
+        // MODAL VIEW
         $("#users tbody").on("click", "#modal_leave", function() {
             event.preventDefault();
             var currow = $(this).closest("tr");
