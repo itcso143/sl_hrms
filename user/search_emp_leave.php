@@ -80,7 +80,20 @@ while ($row = $getIndividualData->fetch(PDO::FETCH_ASSOC)) {
         $downloadLink = 'No File';
     }
     $nestedData[] = $downloadLink;
-    $nestedData[] = $row["status_leave"];
+      $status = $row["status_leave"];
+
+    if ($status == "PENDING") {
+        $status_display = '<span style="color: blue;">' . $status . '</span>';
+    } elseif ($status == "APPROVED") {
+        $status_display = '<span style="color: green;">' . $status . '</span>';
+    } elseif ($status == "DISAPPROVED") {
+        $status_display = '<span style="color: red;">' . $status . '</span>';
+    } else {
+        $status_display = $status; // default color
+    }
+
+    $nestedData[] = $status_display;
+
 
 
 
