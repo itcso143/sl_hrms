@@ -70,7 +70,7 @@ while ($row = $getIndividualData->fetch(PDO::FETCH_ASSOC)) {
     $nestedData[] = $row["leave_code"];
     $nestedData[] = $row["date_from"];
     $nestedData[] =  $row["date_to"];
-    $nestedData[] =  $row["leave_reason"];
+  
     
     $file = $row["attached_file"];
 

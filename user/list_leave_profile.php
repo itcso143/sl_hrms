@@ -356,7 +356,7 @@ $get_view_data->execute();
                                                 <th> LEAVE </th>
                                                 <th> DATE FROM </th>
                                                 <th> DATE TO </th>
-                                                <th> LEAVE REASON </th>
+                                          
                                                 <th> ATTACHED </th>
                                                 <th> STATUS </th>
 

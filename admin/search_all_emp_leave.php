@@ -18,7 +18,7 @@ session_start();
 $requestData = $_REQUEST;
 
 
-$get_employee_sql = "SELECT id,emp_id,date_create,fullname,leave_code,date_from,date_to,status_leave,leave_reason,attached_file,leave_credits FROM tbl_employee_leave_profile ORDER BY id DESC";
+$get_employee_sql = "SELECT id,emp_id,date_create,fullname,leave_code,date_from,date_to,status_leave,leave_reason,attached_file,leave_credits FROM tbl_employee_leave_profile WHERE status='ACTIVE' ORDER BY id DESC";
 
 $getIndividualData = $con->prepare($get_employee_sql);
 $getIndividualData->execute();
@@ -70,7 +70,7 @@ while ($row = $getIndividualData->fetch(PDO::FETCH_ASSOC)) {
     $nestedData[] = $row["leave_code"];
     $nestedData[] = $row["date_from"];
     $nestedData[] =  $row["date_to"];
-    $nestedData[] =  $row["leave_reason"];
+ 
     $file = $row["attached_file"];
 
     if (!empty($file)) {

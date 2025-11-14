@@ -365,7 +365,7 @@ $get_view_data->execute();
                                                 <th> LEAVE </th>
                                                 <th> DATE FROM </th>
                                                 <th> DATE TO </th>
-                                                <th> LEAVE REASON </th>
+
                                                 <th> ATTACHED </th>
                                                 <th> LEAVE CREDITS </th>
                                                 <th> STATUS </th>
@@ -399,19 +399,19 @@ $get_view_data->execute();
     </div>
 
 
-    <div class="modal fade" id="delete_employee" role="dialog" data-backdrop="static" data-keyboard="false">
+    <div class="modal fade" id="delete_leave" role="dialog" data-backdrop="static" data-keyboard="false">
         <div class="modal-dialog modal-sm">
             <div class="modal-content">
                 <div class="modal-header">
                     <h4 class="modal-title">Confirm Delete</h4>
                 </div>
-                <form method="POST" action="">
+                  <form method="POST" action="delete_emp_leave.php">
                     <div class="modal-body">
                         <div class="box-body">
                             <div class="form-group">
                                 <label>Delete Record?</label>
                                 <input readonly="true" type="text" name="emp_id_new" id="emp_id_new" class="form-control">
-                                <input readonly="true" type="text" name="fullname" id="fullname" class="form-control">
+                                <input readonly="true" type="text" name="fullname_leave" id="fullname_leave" class="form-control">
 
                             </div>
 
@@ -422,7 +422,7 @@ $get_view_data->execute();
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
 
-                        <input type="submit" name="delete_employee" class="btn btn-danger" value="Yes">
+                        <input type="submit" name="delete_emp_leave" class="btn btn-danger" value="Yes">
                     </div>
                 </form>
 
@@ -601,6 +601,12 @@ $get_view_data->execute();
            <i class="fa fa-folder"></i> View Leave
           </a>
           </li>
+
+        <li>
+          <a class="dropdown-item delete" href="#" title="Delete Record">
+            <i class="fa fa-trash-o text-danger"></i> Delete
+          </a>
+        </li>
         </ul>
       </div>
     `
@@ -645,7 +651,7 @@ $get_view_data->execute();
             var leave_code = currow.find("td:eq(4)").text();
             var date_from = currow.find("td:eq(5)").text();
             var date_to = currow.find("td:eq(6)").text();
-            var leave_reason_view = currow.find("td:eq(7)").text();
+            // var leave_reason_view = currow.find("td:eq(7)").text();
             var leave_credits_view = currow.find("td:eq(9)").text();
 
 
@@ -658,9 +664,33 @@ $get_view_data->execute();
             $('#leave_code_view').val(leave_code).trigger('change.select2');
             $('#date_from_view').val(date_from);
             $('#date_to_view').val(date_to);
-            $('#leave_reason_view').val(leave_reason_view);
+            // $('#leave_reason_view').val(leave_reason_view);
             $('#leave_deduction_view').val(leave_credits_view);
 
+
+
+            $.ajax({
+                url: 'get_emp_leave_reason.php', // your PHP script
+                type: 'POST',
+                dataType: 'json',
+                data: {
+                    emp_id_leave: leave_id_view
+                },
+                success: function(response) {
+                    if (response.success) {
+                        // Use leave_balance from response.data
+                        var leaveBalance = response.data.leave_reason;
+                        $('#leave_reason_view').val(leaveBalance);
+                    } else {
+                        alert(response.message);
+                        $('#leave_reason_view').val();
+                    }
+                },
+                error: function(xhr, status, error) {
+                    console.error('AJAX Error:', error);
+                    $('#leave_reason_view').val('0'); // set 0 on error
+                }
+            });
 
             $.ajax({
                 url: 'get_emp_leavecredits.php', // your PHP script
@@ -712,6 +742,23 @@ $get_view_data->execute();
 
 
         });
+
+              $(function() {
+            $(document).on('click', '.delete', function(e) {
+                e.preventDefault();
+
+                var currow = $(this).closest("tr");
+                var emp_id_new = currow.find("td:eq(0)").text();
+                var fullname_leave = currow.find("td:eq(3)").text();
+                $('#delete_leave').modal('show');
+                $('#emp_id_new').val(emp_id_new);
+                $('#fullname_leave').val(fullname_leave);
+            });
+        });
+    </script>
+
+    <script>
+  
     </script>
 </body>
 
