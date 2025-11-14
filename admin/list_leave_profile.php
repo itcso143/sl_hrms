@@ -1,8 +1,7 @@
 <?php
 
 include('../config/db_config.php');
-error_reporting(E_ALL);
-ini_set('display_errors', 1);
+
 // include('sql_queries.php');
 // include('insert_dailypayment.php');
 // include('insert_yearlypayment.php');
@@ -230,8 +229,7 @@ $get_view_data->execute();
                                 </div>
                                 <div class="modal-body">
                                     <!-- Your form or content goes here -->
-                                    <form method="post" enctype="multipart/form-data" action="update_approved_leave.php">
-
+                                    <form method="post" enctype="multipart/form-data">
 
                                         <input hidden type="text" class="form-control" id="leave_id_view" name="leave_id_view" value="">
 
@@ -337,11 +335,26 @@ $get_view_data->execute();
                                 <!-- Modal Footer -->
                                 <div class="modal-footer">
                                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                                    <input type="submit" name="update_approved_leave" class="btn btn-primary" value="Approved">
+                                    <input type="submit"
+                                        id="emp_disapproved_view3"
+                                        name="update_disapproved_leave"
+                                        class="btn btn-danger"
+                                        value="Disapproved"
+                                        formaction="update_disapproved_leave.php">
+
+                                    <div id="emp_approved_view">
+                                        <input type="submit"
+                                            id="emp_approved_view"
+                                            name="update_approved_leave"
+                                            class="btn btn-primary"
+                                            value="Approved"
+                                            formaction="update_approved_leave.php">
+                                    </div>
                                 </div>
 
 
                             </div>
+
 
                             </form>
                         </div>
@@ -405,7 +418,7 @@ $get_view_data->execute();
                 <div class="modal-header">
                     <h4 class="modal-title">Confirm Delete</h4>
                 </div>
-                  <form method="POST" action="delete_emp_leave.php">
+                <form method="POST" action="delete_emp_leave.php">
                     <div class="modal-body">
                         <div class="box-body">
                             <div class="form-group">
@@ -679,8 +692,22 @@ $get_view_data->execute();
                 success: function(response) {
                     if (response.success) {
                         // Use leave_balance from response.data
-                        var leaveBalance = response.data.leave_reason;
-                        $('#leave_reason_view').val(leaveBalance);
+                        var leave_reason = response.data.leave_reason;
+                        var approved = response.data.status_leave;
+                        $('#emp_approved_view').val(approved);
+
+                        // If approved, hide the button
+                        let btnValue = $('#emp_approved_view').val();
+                        console.log("Button value:", btnValue);
+
+                        if (btnValue.trim().toUpperCase() === 'APPROVED') {
+                            $('#emp_approved_view').hide();
+                            console.log("Button hidden (value = APPROVED)");
+                        } else {
+                            $('#emp_approved_view').show();
+                            console.log("Button shown (value != APPROVED)");
+                        }
+                        $('#leave_reason_view').val(leave_reason);
                     } else {
                         alert(response.message);
                         $('#leave_reason_view').val();
@@ -743,7 +770,7 @@ $get_view_data->execute();
 
         });
 
-              $(function() {
+        $(function() {
             $(document).on('click', '.delete', function(e) {
                 e.preventDefault();
 
@@ -758,7 +785,7 @@ $get_view_data->execute();
     </script>
 
     <script>
-  
+
     </script>
 </body>
 

@@ -18,7 +18,7 @@ while ($result = $user_data->fetch(PDO::FETCH_ASSOC)) {
 $requestData = $_REQUEST;
 
 
-$get_employee_sql = "SELECT id,emp_id,date_create,fullname,leave_code,date_from,date_to,status_leave,leave_reason,attached_file FROM tbl_employee_leave_profile where emp_id='$emp_id' ORDER BY id DESC";
+$get_employee_sql = "SELECT id,emp_id,date_create,fullname,leave_code,date_from,date_to,status_leave,leave_reason,attached_file FROM tbl_employee_leave_profile where emp_id='$emp_id' AND status='ACTIVE' ORDER BY id DESC";
 
 $getIndividualData = $con->prepare($get_employee_sql);
 $getIndividualData->execute();

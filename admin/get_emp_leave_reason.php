@@ -8,7 +8,7 @@ if (isset($_POST['emp_id_leave'])) {
 
     try {
         // Prepare SQL with placeholder
-        $sql = "SELECT leave_reason FROM tbl_employee_leave_profile WHERE id = :emp_id LIMIT 1";
+        $sql = "SELECT leave_reason,status_leave FROM tbl_employee_leave_profile WHERE id = :emp_id LIMIT 1";
         $stmt = $con->prepare($sql);
         $stmt->execute([':emp_id' => $emp_id_leave]);
 
@@ -18,7 +18,8 @@ if (isset($_POST['emp_id_leave'])) {
             $response = [
                 'success' => true,
                 'data' => [
-                    'leave_reason' => $row['leave_reason']
+                    'leave_reason' => $row['leave_reason'],
+                    'status_leave' => $row['status_leave']
                 ],
                 'message' => 'Leave balance retrieved successfully.'
             ];
@@ -29,7 +30,6 @@ if (isset($_POST['emp_id_leave'])) {
                 'message' => 'Employee not found.'
             ];
         }
-
     } catch (PDOException $e) {
         $response = [
             'success' => false,
@@ -37,7 +37,6 @@ if (isset($_POST['emp_id_leave'])) {
             'message' => 'Database error: ' . $e->getMessage()
         ];
     }
-
 } else {
     $response = [
         'success' => false,
@@ -50,4 +49,3 @@ if (isset($_POST['emp_id_leave'])) {
 header('Content-Type: application/json');
 echo json_encode($response);
 exit;
-?>
