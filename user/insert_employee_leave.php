@@ -43,7 +43,7 @@ if (isset($_POST['insert_employee_leave'])) {
 
 // ✅ Fixed SQL syntax
 $sql = "INSERT INTO tbl_employee_leave_profile 
-    (emp_id,date_create, fullname, leave_code, date_from, date_to, leave_reason,leave_credits attached_file)
+    (emp_id,date_create, fullname, leave_code, date_from, date_to, leave_reason,leave_credits, attached_file)
     VALUES (:emp_id, :date_create, :fullname, :leave_code, :date_from, :date_to, :leave_reason, :leave_credits, :attached_file)";
 
 $stmt = $con->prepare($sql);
