@@ -122,7 +122,7 @@ $get_view_data->execute();
 
                                     <div class="col-lg-3 col-md-4 col-sm-6">
                                         <div class="mb-3">
-                                            <label for="vacation_credits" class="form-label">Vacation Credits</label>
+                                            <label for="vacation_credits" class="form-label">Vacation Leave Credits</label>
                                             <input readonly type="text" class="form-control" id="vacation_credits" name="vacation_credits" placeholder="">
                                         </div>
                                     </div>
@@ -575,26 +575,26 @@ $get_view_data->execute();
                 orderable: false,
                 searchable: false,
                 defaultContent: `
-      <div class="dropdown">
-        <button 
-          class="btn btn-sm btn-primary dropdown-toggle" 
-          type="button" 
-          data-bs-toggle="dropdown" 
-          aria-expanded="false">
-          Actions
-        </button>
-        <ul class="dropdown-menu">
-      
-            <li>
-        <a class="dropdown-item" id="modal_leave" href="#" title="View Leave" data-bs-toggle="modal" data-bs-target="#addSalaryModal">
-           <i class="fa fa-folder"></i> View Leave
-          </a>
-          </li>
-        </ul>
-      </div>
     `
             }]
 
+    //   <div class="dropdown">
+    //     <button 
+    //       class="btn btn-sm btn-primary dropdown-toggle" 
+    //       type="button" 
+    //       data-bs-toggle="dropdown" 
+    //       aria-expanded="false">
+    //       Actions
+    //     </button>
+    //     <ul class="dropdown-menu">
+      
+    //         <li>
+    //     <a class="dropdown-item" id="modal_leave" href="#" title="View Leave" data-bs-toggle="modal" data-bs-target="#addSalaryModal">
+    //        <i class="fa fa-folder"></i> View Leave
+    //       </a>
+    //       </li>
+    //     </ul>
+    //   </div>
             // <li>
             //   <a class="dropdown-item" id="modal_schedule" href="#" title="Add Schedule" data-bs-toggle="modal" data-bs-target="#addScheduleModal">
             //     <i class="fa fa-calendar"></i> Add Schedule
