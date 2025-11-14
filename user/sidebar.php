@@ -21,7 +21,7 @@ $logs_id_final = '';
 $get_logs_id = '';
 
 $emp_id_new2 = '';
-$logs_id_new ='';
+$logs_id_new = '';
 
 include('update_user_activity.php');
 
@@ -62,7 +62,7 @@ while ($result4 = $user_data->fetch(PDO::FETCH_ASSOC)) {
     $get_logs_id = $result4['logs_id'];
   }
 
- 
+
   $date_logs1 = date('Y-m-d');
 
   // Prepare SQL to get today's punch-in for this employee
@@ -570,10 +570,10 @@ while ($result4 = $user_data->fetch(PDO::FETCH_ASSOC)) {
 
         </ul>
 
-   </li>
+      </li>
 
 
-     <li class="nav-item has-treeview">
+      <li class="nav-item has-treeview">
         <a href="#" class="nav-link">
           <i class="nav-icon fa fa-folder"></i>
           <p>
@@ -595,7 +595,7 @@ while ($result4 = $user_data->fetch(PDO::FETCH_ASSOC)) {
 
         </ul>
 
-   </li>
+      </li>
 
 
       <li class="nav-item has-treeview">

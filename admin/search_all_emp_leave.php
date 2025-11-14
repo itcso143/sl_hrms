@@ -3,22 +3,22 @@ include('../config/db_config.php');
 session_start();
 
 
-$user_id = $_SESSION['id'];
-$get_user_sql = "SELECT * FROM tbl_users where id = :id ";
-$user_data = $con->prepare($get_user_sql);
-$user_data->execute([':id' => $user_id]);
-while ($result = $user_data->fetch(PDO::FETCH_ASSOC)) {
+// $user_id = $_SESSION['id'];
+// $get_user_sql = "SELECT * FROM tbl_users where id = :id ";
+// $user_data = $con->prepare($get_user_sql);
+// $user_data->execute([':id' => $user_id]);
+// while ($result = $user_data->fetch(PDO::FETCH_ASSOC)) {
 
 
 
-    $emp_id = $result['emp_id'];
-}
+//     $emp_id = $result['emp_id'];
+// }
 
 // storing  request (ie, get/post) global array to a variable  
 $requestData = $_REQUEST;
 
 
-$get_employee_sql = "SELECT id,emp_id,date_create,fullname,leave_code,date_from,date_to,status_leave,leave_reason,attached_file FROM tbl_employee_leave_profile where emp_id='$emp_id' ORDER BY id DESC";
+$get_employee_sql = "SELECT id,emp_id,date_create,fullname,leave_code,date_from,date_to,status_leave,leave_reason,attached_file,leave_credits FROM tbl_employee_leave_profile ORDER BY id DESC";
 
 $getIndividualData = $con->prepare($get_employee_sql);
 $getIndividualData->execute();
@@ -71,7 +71,6 @@ while ($row = $getIndividualData->fetch(PDO::FETCH_ASSOC)) {
     $nestedData[] = $row["date_from"];
     $nestedData[] =  $row["date_to"];
     $nestedData[] =  $row["leave_reason"];
-    
     $file = $row["attached_file"];
 
     if (!empty($file)) {
@@ -80,7 +79,20 @@ while ($row = $getIndividualData->fetch(PDO::FETCH_ASSOC)) {
         $downloadLink = 'No File';
     }
     $nestedData[] = $downloadLink;
-    $nestedData[] = $row["status_leave"];
+    $nestedData[] =  $row["leave_credits"];
+    $status = $row["status_leave"];
+
+    if ($status == "PENDING") {
+        $status_display = '<span style="color: blue;">' . $status . '</span>';
+    } elseif ($status == "APPROVED") {
+        $status_display = '<span style="color: green;">' . $status . '</span>';
+    } elseif ($status == "DISAPPROVED") {
+        $status_display = '<span style="color: red;">' . $status . '</span>';
+    } else {
+        $status_display = $status; // default color
+    }
+
+    $nestedData[] = $status_display;
 
 
 

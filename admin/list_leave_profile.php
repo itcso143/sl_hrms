@@ -221,7 +221,6 @@ $get_view_data->execute();
 
                     <!-- Add View Leave Modal -->
                     <div class="modal fade" id="modal_leave" tabindex="-1" aria-labelledby="v" aria-hidden="true">
-
                         <div class="modal-dialog modal-dialog" style="max-width: 900px; width: 90%;">
 
                             <div class="modal-content">
@@ -231,8 +230,10 @@ $get_view_data->execute();
                                 </div>
                                 <div class="modal-body">
                                     <!-- Your form or content goes here -->
-                                    <form method="post" enctype="multipart/form-data" action="insert_employee_leave.php">
+                                    <form method="post" enctype="multipart/form-data" action="update_approved_leave.php">
 
+
+                                        <input hidden type="text" class="form-control" id="leave_id_view" name="leave_id_view" value="">
 
 
 
@@ -247,8 +248,8 @@ $get_view_data->execute();
 
                                             <div class="col-lg-4 col-md-4 col-sm-6">
                                                 <div class="mb-3">
-                                                    <label for="leave_creadits_view" class="form-label">Leave Credits</label>
-                                                    <input readonly type="text" class="form-control" id="leave_creadits_view" name="leave_creadits_view" placeholder="">
+                                                    <label for="leave_credits_view" class="form-label">Leave Credits</label>
+                                                    <input readonly type="text" class="form-control" id="leave_credits_view" name="leave_credits_view" placeholder="">
                                                 </div>
                                             </div>
 
@@ -304,21 +305,20 @@ $get_view_data->execute();
                                         <br>
                                         <div class="col-lg-12 col-md-4 col-sm-6">
                                             <div class="mb-3">
-                                                <label for="leave_reason" class="form-label">Reason for Leave:</label>
-                                                <input type="text" class="form-control" id="leave_reason" name="leave_reason" placeholder="">
+                                                <label for="leave_reason_view" class="form-label">Reason for Leave:</label>
+                                                <input type="text" class="form-control" id="leave_reason_view" name="leave_reason_view" placeholder="">
                                             </div>
                                         </div>
 
-                                        <label for="file">Choose a file or image:</label>
-                                        <input type="file" name="file" id="file" required>
+
 
                                 </div>
 
                                 <!-- Modal Footer -->
-                                <!-- <div class="modal-footer">
+                                <div class="modal-footer">
                                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                                    <input type="submit" name="insert_employee_leave" class="btn btn-primary" value="Submit">
-                                </div> -->
+                                    <input type="submit" name="update_approved_leave" class="btn btn-primary" value="Approved">
+                                </div>
 
 
                             </div>
@@ -347,6 +347,7 @@ $get_view_data->execute();
                                                 <th> DATE TO </th>
                                                 <th> LEAVE REASON </th>
                                                 <th> ATTACHED </th>
+                                                <th> LEAVE CREDITS </th>
                                                 <th> STATUS </th>
 
                                                 <th> Options</th>
@@ -548,7 +549,7 @@ $get_view_data->execute();
             scrollX: false,
             searching: false, // ✅ disables the built-in search box
             ajax: {
-                url: "search_emp_leave.php",
+                url: "search_all_emp_leave.php",
                 type: "POST",
                 error: function(xhr, status, error) {
                     console.error("AJAX Error:", {
@@ -617,24 +618,28 @@ $get_view_data->execute();
         $("#users tbody").on("click", "#modal_leave", function() {
             event.preventDefault();
             var currow = $(this).closest("tr");
-
+            var leave_id_view = currow.find("td:eq(0)").text();
             var emp_id = currow.find("td:eq(1)").text();
             var date_create = currow.find("td:eq(2)").text();
             var fullname = currow.find("td:eq(3)").text();
             var leave_code = currow.find("td:eq(4)").text();
             var date_from = currow.find("td:eq(5)").text();
             var date_to = currow.find("td:eq(6)").text();
-
+            var leave_reason_view = currow.find("td:eq(7)").text();
+            var leave_credits_view = currow.find("td:eq(9)").text();
 
 
             console.log("test");
             $('#modal_leave').modal('show');
+            $('#leave_id_view').val(leave_id_view);
             $('#emp_id_view').val(emp_id);
             $('#date_create_view').val(date_create);
             $('#fullname_view').val(fullname);
             $('#leave_code_view').val(leave_code).trigger('change.select2');
             $('#date_from_view').val(date_from);
             $('#date_to_view').val(date_to);
+            $('#leave_reason_view').val(leave_reason_view);
+            $('#leave_credits_view').val(leave_credits_view);
 
 
         });
