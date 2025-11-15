@@ -49,11 +49,12 @@ LEFT JOIN (
         MAX(schedule_code) AS schedule_code,
         MAX(date_logs) AS date_logs
     FROM tbl_employee_timelogs
-    WHERE DATE(date_logs) = :today 
-      AND schedule_code != 'F5'
+    WHERE DATE(date_logs) = :today
     GROUP BY emp_id
 ) t ON t.emp_id = r.emp_id
+WHERE (t.schedule_code IS NULL OR t.schedule_code != 'F5')
 ORDER BY r.id ASC;
+
 ";
 
 $stmt = $con->prepare($sql);
