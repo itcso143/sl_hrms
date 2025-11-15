@@ -52,7 +52,7 @@ LEFT JOIN (
    
     GROUP BY emp_id
 ) t ON t.emp_id = r.emp_id 
-where r.last_activity !=''
+where r.last_activity !='' and t.schedule_code !='F5'
 ORDER BY r.id ASC
 ";
 
