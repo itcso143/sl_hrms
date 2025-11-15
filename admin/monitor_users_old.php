@@ -57,7 +57,7 @@ ORDER BY r.id ASC;
 
 $stmt = $con->prepare($sql);
 $stmt->bindParam(':today', $today);
-$stmt->bindParam(':yesterday', $yesterday);
+
 $stmt->execute();
 ?>
 
