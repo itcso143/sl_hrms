@@ -48,7 +48,7 @@ LEFT JOIN (
         MAX(lunch_out) AS lunch_out,
         MAX(schedule_code) AS schedule_code,
         MAX(date_logs) AS date_logs
-    FROM tbl_employee_timelogs where schedule_code != 'F5'
+    FROM tbl_employee_timelogs where date_logs = :today
    
     GROUP BY emp_id
 ) t ON t.emp_id = r.emp_id 
