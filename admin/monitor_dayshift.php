@@ -51,7 +51,7 @@ LEFT JOIN (
    
     GROUP BY emp_id
 ) t ON t.emp_id = r.emp_id 
- WHERE t.schedule_code !='F5' and date_logs= :today
+ WHERE t.schedule_code !='F5' 
 ORDER BY r.id ASC
 ";
 
