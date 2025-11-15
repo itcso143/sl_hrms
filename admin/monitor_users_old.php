@@ -29,39 +29,31 @@ SELECT
     t.lunch_out,
     t.schedule_code,
     t.date_logs,
- IF(
-    r.last_activity IS NULL, 
-    'offline',
-    IF(TIMESTAMPDIFF(MINUTE, r.last_activity, NOW()) <= 5, 'online', 'offline')
-) AS current_status
+    IF(
+        r.last_activity IS NULL, 
+        'offline',
+        IF(TIMESTAMPDIFF(MINUTE, r.last_activity, NOW()) <= 5, 'online', 'offline')
+    ) AS current_status
 FROM tbl_users r
-LEFT JOIN tbl_employee_info e ON e.emp_id = r.emp_id
+LEFT JOIN tbl_employee_info e 
+    ON e.emp_id = r.emp_id
 LEFT JOIN (
-    SELECT 
-        emp_id,
-        MAX(punch_in) AS punch_in,
-        MAX(punch_out) AS punch_out,
-        MAX(break_in) AS break_in,
-        MAX(break_out) AS break_out,
-        MAX(lunch_in) AS lunch_in,
-        MAX(lunch_out) AS lunch_out,
-        -- Add schedule_code if needed, else null
-        MAX(schedule_code) AS schedule_code,
-        MAX(date_logs) AS date_logs
-    FROM (
-        SELECT emp_id, punch_in, punch_out, break_in, break_out, lunch_in, lunch_out, schedule_code, date_logs
+    SELECT t1.*
+    FROM tbl_employee_timelogs t1
+    JOIN (
+        -- Get the latest log per employee for today
+        SELECT emp_id, MAX(date_logs) AS max_log
         FROM tbl_employee_timelogs
         WHERE DATE(date_logs) = :today
-
-        UNION ALL
-
-        SELECT emp_id, punch_in, punch_out, break_in, break_out, lunch_in, lunch_out, schedule_code, date_logs
-        FROM tbl_employee_timelogs
-        WHERE DATE(date_logs) = :yesterday AND TIME(punch_in) >= '23:00:00'
-    ) combined
-    GROUP BY emp_id
-) t ON t.emp_id = r.emp_id
-ORDER BY r.id ASC";
+        GROUP BY emp_id
+    ) t2 
+    ON t1.emp_id = t2.emp_id 
+       AND t1.date_logs = t2.max_log
+       AND t1.schedule_code != 'F5'  -- filter F5 here at the row level
+) t 
+ON t.emp_id = r.emp_id
+ORDER BY r.id ASC;
+";
 
 $stmt = $con->prepare($sql);
 $stmt->bindParam(':today', $today);
