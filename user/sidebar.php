@@ -8,7 +8,7 @@ date_default_timezone_set('Asia/Manila');
 // $serverTime = time(); 
 
 $user_id = $_SESSION['id'];
-
+$date = date('Y-m-d');
 $username = '';
 $photo = '';
 $date_logs = '';
@@ -61,6 +61,81 @@ while ($result4 = $user_data->fetch(PDO::FETCH_ASSOC)) {
 
     $get_logs_id = $result4['logs_id'];
   }
+
+  //TIME LOGS FILTER PUNCH IN
+  $punch_in_time = '';
+  $get_logs_sql = "SELECT id,logs_id,punch_in FROM tbl_employee_timelogs WHERE logs_id= :logs_id and punch_in !='' and date_logs ='$date' order by id DESC LIMIT 1";
+  $get_logs_data = $con->prepare($get_logs_sql);
+  $get_logs_data->execute([':logs_id' => $get_logs_id]);
+  while ($result4 = $get_logs_data->fetch(PDO::FETCH_ASSOC)) {
+
+    $punch_in_time = $result4['punch_in'];
+  }
+  $break_in_time = '';
+  //TIME LOGS FILTER PUNCH IN
+  $get_logs_sql = "SELECT id,logs_id,break_in FROM tbl_employee_timelogs WHERE logs_id= :logs_id and break_in !='' order by id DESC LIMIT 1";
+  $get_logs_data = $con->prepare($get_logs_sql);
+  $get_logs_data->execute([':logs_id' => $get_logs_id]);
+  while ($result4 = $get_logs_data->fetch(PDO::FETCH_ASSOC)) {
+
+    $break_in_time = $result4['break_in'];
+  }
+
+  $break_out_time = '';
+  //TIME LOGS FILTER PUNCH IN
+  $get_logs_sql = "SELECT id,logs_id,break_out FROM tbl_employee_timelogs WHERE logs_id= :logs_id and break_out !='' order by id DESC LIMIT 1";
+  $get_logs_data = $con->prepare($get_logs_sql);
+  $get_logs_data->execute([':logs_id' => $get_logs_id]);
+  while ($result4 = $get_logs_data->fetch(PDO::FETCH_ASSOC)) {
+
+    $break_out_time = $result4['break_out'];
+  }
+
+  $lunch_in_time = '';
+  //TIME LOGS FILTER PUNCH IN
+  $get_logs_sql = "SELECT id,logs_id,lunch_in FROM tbl_employee_timelogs WHERE logs_id= :logs_id and lunch_in !='' order by id DESC LIMIT 1";
+  $get_logs_data = $con->prepare($get_logs_sql);
+  $get_logs_data->execute([':logs_id' => $get_logs_id]);
+  while ($result4 = $get_logs_data->fetch(PDO::FETCH_ASSOC)) {
+
+    $lunch_in_time = $result4['lunch_in'];
+  }
+
+  $lunch_out_time = '';
+  //TIME LOGS FILTER PUNCH IN
+  $get_logs_sql = "SELECT id,logs_id,lunch_out FROM tbl_employee_timelogs WHERE logs_id= :logs_id and lunch_out !='' order by id DESC LIMIT 1";
+  $get_logs_data = $con->prepare($get_logs_sql);
+  $get_logs_data->execute([':logs_id' => $get_logs_id]);
+  while ($result4 = $get_logs_data->fetch(PDO::FETCH_ASSOC)) {
+
+    $lunch_out_time = $result4['lunch_out'];
+  }
+
+  $punch_out_time = '';
+  $complete_time = '';
+  $punch_in_open = 'CLOSE';
+  //TIME LOGS FILTER PUNCH IN
+  $get_logs_sql = "SELECT id,logs_id,punch_out FROM tbl_employee_timelogs WHERE logs_id= :logs_id and punch_out !='' order by id DESC LIMIT 1";
+  $get_logs_data = $con->prepare($get_logs_sql);
+  $get_logs_data->execute([':logs_id' => $get_logs_id]);
+  while ($result4 = $get_logs_data->fetch(PDO::FETCH_ASSOC)) {
+
+    $punch_out_time = $result4['punch_out'];
+    $complete_time = "Your daily logs are complete.";
+
+   
+  }
+
+ $get_logs_sql = "SELECT id,logs_id,punch_out FROM tbl_employee_timelogs WHERE logs_id= :logs_id and punch_out !='' order by id DESC LIMIT 1";
+    $get_logs_data = $con->prepare($get_logs_sql);
+    $get_logs_data->execute([':logs_id' => $get_logs_id]);
+    while ($result4 = $get_logs_data->fetch(PDO::FETCH_ASSOC)) {
+
+      $punch_in_open = "OPEN";
+    }
+
+
+
 
 
   $date_logs1 = date('Y-m-d');
@@ -223,10 +298,19 @@ while ($result4 = $user_data->fetch(PDO::FETCH_ASSOC)) {
 
       ?>
 
+      <div class="row justify-content-center">
+        <div class="col-md-5 text-center">
+          <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#timeInModal">
+            Attendance
+          </button>
+        </div>
 
-      <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#timeInModal">
-        Attendance
-      </button>
+        <div class="col-md-5 text-center">
+          <button type="button" class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#OverTimeModal">
+            Over Time
+          </button>
+        </div>
+      </div>
 
 
 
@@ -247,6 +331,135 @@ while ($result4 = $user_data->fetch(PDO::FETCH_ASSOC)) {
 
               </div>
             </div>
+
+
+
+            <!-- MODAL BODY -->
+            <div class="modal-body text-center">
+              <p>Click the button to log your time.</p>
+              <h4 class="fw-bold mt-3">
+                <!-- PHP Date -->
+                <?php echo date('F j, Y'); ?>
+                <br>
+                Current Time: <span id="liveTimeOvertime" class="text-primary"></span>
+                <br>
+                <div class="row justify-content-center text-center">
+                  <div class="col-md-6 col-sm-8 col-10">
+                    <input readonly
+                      type="text"
+                      id="logs_id"
+                      name="logs_id"
+                      class="form-control text-center"
+                      placeholder=""
+                      value="<?php echo $get_logs_id; ?>">
+
+                    <br>
+                    <?php if ($punch_out_time != ''): ?>
+                      <span style="color: green;"><?= $complete_time ?></span>
+                    <?php endif; ?>
+
+                  </div>
+
+
+                </div>
+              </h4>
+
+
+            </div>
+
+            <!-- MODAL FOOTER -->
+            <div class="modal-footer py-3">
+              <div class="row justify-content-center text-center">
+
+             
+                  <div class="col-auto">
+                    <button  type="button" id="save_time_in" class="btn btn-primary px-3">Time In</button>
+                  </div>
+           
+
+                <?php if ($break_in_time != '') { ?>
+                  <div class="col-auto">
+                    <button disabled type="button" id="save_time_breakin2" class="btn btn-warning px-3">Break In</button>
+                  </div>
+                <?php } else { ?>
+                  <div class="col-auto">
+                    <button type="button" id="save_time_breakin2" class="btn btn-warning px-3">Break In</button>
+                  </div>
+                <?php } ?>
+
+                <?php if ($break_out_time != '') { ?>
+                  <div class="col-auto">
+                    <button disabled type="button" id="save_time_breakout2" class="btn btn-danger px-3">Break Out</button>
+                  </div>
+                <?php } else { ?>
+                  <div class="col-auto">
+                    <button type="button" id="save_time_breakout2" class="btn btn-danger px-3">Break Out</button>
+                  </div>
+                <?php } ?>
+
+                <?php if ($lunch_in_time != '') { ?>
+                  <div class="col-auto">
+                    <button disabled type="button" id="save_time_lunchin2" class="btn btn-warning px-3">Lunch In</button>
+                  </div>
+                <?php } else { ?>
+                  <div class="col-auto">
+                    <button type="button" id="save_time_lunchin2" class="btn btn-warning px-3">Lunch In</button>
+                  </div>
+                <?php } ?>
+
+                <?php if ($lunch_out_time != '') { ?>
+                  <div class="col-auto">
+                    <button disabled type="button" id="save_time_lunchout2" class="btn btn-danger px-3">Lunch Out</button>
+                  </div>
+                <?php } else { ?>
+
+                  <div class="col-auto">
+                    <button type="button" id="save_time_lunchout2" class="btn btn-danger px-3">Lunch Out</button>
+                  </div>
+                <?php } ?>
+
+                <?php if ($punch_out_time != '') { ?>
+
+                  <div class="col-auto">
+                    <button disabled type="button" id="save_time_out2" class="btn btn-primary px-3">Time Out</button>
+                  </div>
+                <?php } else { ?>
+
+
+                  <div class="col-auto">
+                    <button type="button" id="save_time_out2" class="btn btn-primary px-3">Time Out</button>
+                  </div>
+                <?php } ?>
+
+
+
+
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+      <!-- FLOATING MODAL -->
+      <div class="modal floating-modal" id="OverTimeModal" tabindex="-1" aria-labelledby="OTModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+          <div class="modal-content">
+
+            <!-- MODAL HEADER -->
+            <div class="modal-header draggable">
+              <h5 class="modal-title" id="timeInModalLabel">Over Time Attendance</h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+              <div>
+                <!-- Minimize Button -->
+                <!-- <button type="button" class="btn btn-secondary btn-sm me-2" id="minimizeModal" title="Minimize">–</button> -->
+                <!-- Maximize Button -->
+                <!-- <button type="button" class="btn btn-secondary btn-sm me-2" id="maximizeModal" title="Maximize">⬜</button> -->
+
+              </div>
+            </div>
+
+
 
             <!-- MODAL BODY -->
             <div class="modal-body text-center">
@@ -272,29 +485,10 @@ while ($result4 = $user_data->fetch(PDO::FETCH_ASSOC)) {
             </div>
 
             <!-- MODAL FOOTER -->
-            <div class="modal-footer py-3">
-              <div class="row justify-content-center text-center">
-                <div class="col-auto">
-                  <button type="button" id="save_time_in" class="btn btn-primary px-3">Time In</button>
-                </div>
-                <div class="col-auto">
-                  <button type="button" id="save_time_breakin2" class="btn btn-warning px-3">Break In</button>
-                </div>
-
-                <div class="col-auto">
-                  <button type="button" id="save_time_breakout2" class="btn btn-danger px-3">Break Out</button>
-                </div>
-                <div class="col-auto">
-                  <button type="button" id="save_time_lunchin2" class="btn btn-warning px-3">Lunch In</button>
-                </div>
-
-                <div class="col-auto">
-                  <button type="button" id="save_time_lunchout2" class="btn btn-danger px-3">Lunch Out</button>
-                </div>
-
-                <div class="col-auto">
-                  <button type="button" id="save_time_out2" class="btn btn-primary px-3">Time Out</button>
-                </div>
+            <div class="modal-footer">
+              <div class="d-flex justify-content-center w-100">
+                <button type="button" id="save_time_in" class="btn btn-primary px-3 mx-2">OverTime In</button>
+                <button type="button" id="save_time_out2" class="btn btn-warning px-3 mx-2">OverTime Out</button>
               </div>
             </div>
 
@@ -778,7 +972,7 @@ while ($result4 = $user_data->fetch(PDO::FETCH_ASSOC)) {
         success: function(response) {
           console.log('Server response:', response);
           alert('Time Out saved successfully!');
-
+          location.reload();
 
         },
         error: function(xhr, status, error) {
@@ -992,7 +1186,7 @@ while ($result4 = $user_data->fetch(PDO::FETCH_ASSOC)) {
           console.log('Server response:', response);
           alert('Break Out saved successfully!');
 
-
+          location.reload();
 
 
         },
@@ -1060,7 +1254,7 @@ while ($result4 = $user_data->fetch(PDO::FETCH_ASSOC)) {
           console.log('Server response:', response);
           alert('Break In saved successfully!');
 
-
+          location.reload();
 
         },
         error: function(xhr, status, error) {
@@ -1126,7 +1320,7 @@ while ($result4 = $user_data->fetch(PDO::FETCH_ASSOC)) {
           console.log('Server response:', response);
           alert('Lunch Out saved successfully!');
 
-
+          location.reload();
         },
         error: function(xhr, status, error) {
           console.error('AJAX Error:', error);
@@ -1161,6 +1355,27 @@ while ($result4 = $user_data->fetch(PDO::FETCH_ASSOC)) {
   document.getElementById('lunchInModal').addEventListener('shown.bs.modal', updateLiveTime);
 </script>
 
+<!-- OVER TIME -->
+<script>
+  function updateLiveTime() {
+    const now = new Date();
+    const options = {
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit',
+      hour12: false // force 24-hour format
+    };
+    document.getElementById("liveTimeOvertime").textContent = now.toLocaleTimeString([], options);
+  }
+
+  // Update every second
+  setInterval(updateLiveTime, 1000);
+
+  // Initialize immediately when modal opens
+  document.getElementById('lunchInModal').addEventListener('shown.bs.modal', updateLiveTime);
+</script>
+
+
 <script>
   $(document).ready(function() {
     $('#save_time_lunchin2').on('click', function() {
@@ -1190,7 +1405,7 @@ while ($result4 = $user_data->fetch(PDO::FETCH_ASSOC)) {
         success: function(response) {
           console.log('Server response:', response);
           alert('Lunch In saved successfully!');
-
+          location.reload();
 
         },
         error: function(xhr, status, error) {
