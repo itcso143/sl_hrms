@@ -16,9 +16,9 @@ function formatTime($time)
 $sql = "
 SELECT 
     r.id,
-    r.emp_id, 
-    r.username, 
-    r.user_type, 
+    r.emp_id,
+    r.username,
+    r.user_type,
     r.last_activity,
     e.fullname,
     t.punch_in,
@@ -31,27 +31,29 @@ SELECT
     t.date_logs,
     IF(
         r.last_activity IS NULL, 
-        'offline',
+        'offline', 
         IF(TIMESTAMPDIFF(MINUTE, r.last_activity, NOW()) <= 5, 'online', 'offline')
     ) AS current_status
 FROM tbl_users r
-LEFT JOIN tbl_employee_info e ON e.emp_id = r.emp_id
+LEFT JOIN tbl_employee_info e 
+    ON e.emp_id = r.emp_id
 LEFT JOIN (
-    SELECT 
-        emp_id,
-        MAX(punch_in) AS punch_in,
-        MAX(punch_out) AS punch_out,
-        MAX(break_in) AS break_in,
-        MAX(break_out) AS break_out,
-        MAX(lunch_in) AS lunch_in,
-        MAX(lunch_out) AS lunch_out,
-        MAX(schedule_code) AS schedule_code,
-        MAX(date_logs) AS date_logs
-    FROM tbl_employee_timelogs
-    WHERE DATE(date_logs) = :today   AND schedule_code !='F5'
-    GROUP BY emp_id
-) t ON t.emp_id = r.emp_id 
-ORDER BY r.id ASC
+    SELECT te.*
+    FROM tbl_employee_timelogs te
+    INNER JOIN (
+        SELECT emp_id, MAX(punch_in) AS max_punch_in
+        FROM tbl_employee_timelogs
+        WHERE DATE(date_logs) = :today
+          AND schedule_code != 'F5'
+        GROUP BY emp_id
+    ) tmax 
+    ON te.emp_id = tmax.emp_id 
+    AND te.punch_in = tmax.max_punch_in
+    WHERE DATE(te.date_logs) = :today
+      AND te.schedule_code != 'F5'
+) t 
+    ON t.emp_id = r.emp_id
+ORDER BY r.id ASC;
 ";
 
 $stmt = $con->prepare($sql);
