@@ -52,9 +52,8 @@ LEFT JOIN (
     WHERE DATE(date_logs) = :today
     GROUP BY emp_id
 ) t ON t.emp_id = r.emp_id
-WHERE r.last_activity IS NOT NULL
-  AND r.last_activity != ''
-  AND (
+WHERE 
+  (
         t.schedule_code IS NULL 
         OR (t.schedule_code != 'F5' AND t.schedule_code != '')
       )
