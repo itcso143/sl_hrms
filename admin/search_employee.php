@@ -26,7 +26,7 @@ $columns = array(
 $requestData = $_REQUEST;
 
 
-$get_employee_sql = "SELECT emp_id,date_joining,schedule_code,fullname,photo FROM tbl_employee_info where status='ACTIVE' ORDER BY id DESC";
+$get_employee_sql = "SELECT emp_id,date_joining,schedule_code,fullname,photo FROM tbl_employee_info where status='ACTIVE' ORDER BY id ASC";
 
 $getIndividualData = $con->prepare($get_employee_sql);
 $getIndividualData->execute();
