@@ -4,6 +4,7 @@ include('../config/db_config.php');
 date_default_timezone_set('Asia/Manila');
 
 $today = date('Y-m-d');
+$sched_code_filter ="F5";
 $yesterday = date('Y-m-d', strtotime('-1 day'));
 
 // Format time helper function
@@ -47,16 +48,17 @@ LEFT JOIN (
         MAX(lunch_out) AS lunch_out,
         MAX(schedule_code) AS schedule_code,
         MAX(date_logs) AS date_logs
-    FROM tbl_employee_timelogs where schedule_code !='F5'
+    FROM tbl_employee_timelogs where schedule_code != 'F5'
    
     GROUP BY emp_id
 ) t ON t.emp_id = r.emp_id 
-
+where r.last_activity !=''
 ORDER BY r.id ASC
 ";
 
 $stmt = $con->prepare($sql);
 $stmt->bindParam(':today', $today);
+
 
 $stmt->execute();
 ?>
