@@ -49,13 +49,12 @@ LEFT JOIN (
         MAX(schedule_code) AS schedule_code,
         MAX(date_logs) AS date_logs
     FROM tbl_employee_timelogs
-    WHERE DATE(date_logs) = :today
+    WHERE DATE(date_logs) = :today 
+      AND schedule_code != 'F5'
     GROUP BY emp_id
 ) t ON t.emp_id = r.emp_id
-WHERE 
-      t.schedule_code IS NOT NULL
-  AND t.schedule_code != ''
-  AND t.schedule_code != 'F5'
+WHERE r.last_activity IS NOT NULL
+  AND r.last_activity != ''
 ORDER BY r.id ASC;
 
 ";
@@ -111,4 +110,3 @@ $stmt->execute();
     </tr>
   <?php endwhile; ?>
 </table>
-
