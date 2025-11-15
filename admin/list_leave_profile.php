@@ -665,7 +665,7 @@ $get_view_data->execute();
             var date_from = currow.find("td:eq(5)").text();
             var date_to = currow.find("td:eq(6)").text();
             // var leave_reason_view = currow.find("td:eq(7)").text();
-            var leave_credits_view = currow.find("td:eq(9)").text();
+            var leave_credits_view = currow.find("td:eq(8)").text();
 
 
             console.log("test");

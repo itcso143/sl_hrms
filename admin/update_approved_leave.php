@@ -7,113 +7,84 @@ if (isset($_POST['update_approved_leave'])) {
 
     if (!empty($_POST['emp_id_view']) && !empty($_POST['leave_code_view'])) {
 
+        $leave_id = $_POST['leave_id_view'];
+        $emp_id   = $_POST['emp_id_view'];
 
-        $leave_id_view = $_POST['leave_id_view'];
-        $emp_id_view = $_POST['emp_id_view'];                // employee ID
-        $leave_used   = (int) $_POST['leave_deduction_view'];  // leave to deduct
-        $leave_used_vacation   = (int) $_POST['leave_deduction_view'];
-        $leave_code_view = $_POST['leave_code_view'];
+        // force numeric value
+        $leave_used = isset($_POST['leave_deduction_view']) ? (float) $_POST['leave_deduction_view'] : 0;
 
+        // normalize leave type
+        $leave_code = strtolower(trim($_POST['leave_code_view']));
 
-        $leave_sick_balance = $_POST['leave_sick_balance'];
-        $leave_vacation_balance = $_POST['leave_vacation_balance'];
+        try {
 
-        if ($leave_code_view === 'Sick Leave') {
-            // GET EMPLOYEE LEAVE BALANCE
-            $get_emp_info_sql = "SELECT leave_balance FROM tbl_employee_info WHERE emp_id = :emp_id";
-            $stmt = $con->prepare($get_emp_info_sql);
-            $stmt->execute([':emp_id' => $emp_id_view]);
+            $con->beginTransaction();
 
-            $emp = $stmt->fetch(PDO::FETCH_ASSOC);
+            if ($leave_code === 'sick leave') {
 
-            if (!$emp) {
-                $_SESSION['status'] = "Employee not found!";
-                $_SESSION['status_code'] = "error";
-                header("Location: list_employee.php");
-                exit();
+                $stmt = $con->prepare("SELECT leave_balance FROM tbl_employee_info WHERE emp_id = :emp_id");
+                $stmt->execute([':emp_id' => $emp_id]);
+                $emp = $stmt->fetch(PDO::FETCH_ASSOC);
+
+                if (!$emp) throw new Exception("Employee not found.");
+
+                $old = (float)$emp['leave_balance'];
+                $new = max(0, $old - $leave_used);
+
+                // Log for debugging
+                error_log("SL: emp_id=$emp_id old=$old used=$leave_used new=$new");
+
+                $update_profile = $con->prepare("UPDATE tbl_employee_leave_profile 
+                    SET status_leave = 'APPROVED' WHERE id = :id");
+                $update_profile->execute([':id' => $leave_id]);
+
+                $update_balance = $con->prepare("UPDATE tbl_employee_info 
+                    SET leave_balance = :bal WHERE emp_id = :emp_id");
+                $update_balance->execute([':bal' => $new, ':emp_id' => $emp_id]);
+
+            } elseif ($leave_code === 'vacation leave') {
+
+                $stmt = $con->prepare("SELECT vacation_balance FROM tbl_employee_info WHERE emp_id = :emp_id");
+                $stmt->execute([':emp_id' => $emp_id]);
+                $emp = $stmt->fetch(PDO::FETCH_ASSOC);
+
+                if (!$emp) throw new Exception("Employee not found.");
+
+                $old = (float)$emp['vacation_balance'];
+                $new = max(0, $old - $leave_used);
+
+                error_log("VL: emp_id=$emp_id old=$old used=$leave_used new=$new");
+
+                $update_profile = $con->prepare("UPDATE tbl_employee_leave_profile 
+                    SET status_leave = 'APPROVED' WHERE id = :id");
+                $update_profile->execute([':id' => $leave_id]);
+
+                $update_balance = $con->prepare("UPDATE tbl_employee_info 
+                    SET vacation_balance = :bal WHERE emp_id = :emp_id");
+                $update_balance->execute([':bal' => $new, ':emp_id' => $emp_id]);
+
+            } else {
+                throw new Exception("Invalid leave type: $leave_code");
             }
 
-            $leave_balance = (int)$emp['leave_balance'];
-            $leave_deduction = max(0, $leave_balance - $leave_used);
+            $con->commit();
 
-            // 1. UPDATE LEAVE STATUS IN LEAVE PROFILE
-            $update_profile_sql = "UPDATE tbl_employee_leave_profile 
-                               SET status_leave = :status_leave
-                               WHERE id = :id";
-
-            $update_profile_stmt = $con->prepare($update_profile_sql);
-            $update_profile_stmt->execute([
-                ':status_leave' => 'APPROVED',
-                ':id'       => $leave_id_view
-            ]);
-
-            // 2. UPDATE LEAVE BALANCE IN EMPLOYEE INFO
-            $update_leave_sql = "UPDATE tbl_employee_info 
-                             SET leave_balance = :leave_balance
-                             WHERE emp_id = :emp_id";
-
-            $update_leave_stmt = $con->prepare($update_leave_sql);
-            $update_leave_stmt->execute([
-                ':leave_balance' => $leave_deduction,
-                ':emp_id'        => $emp_id_view
-            ]);
-        }
-
-
-
-        if ($leave_code_view === 'Vacation Leave') {
-            // GET EMPLOYEE LEAVE BALANCE
-            $get_emp_info_sql = "SELECT vacation_balance FROM tbl_employee_info WHERE emp_id = :emp_id";
-            $stmt = $con->prepare($get_emp_info_sql);
-            $stmt->execute([':emp_id' => $emp_id_view]);
-
-            $emp = $stmt->fetch(PDO::FETCH_ASSOC);
-
-            if (!$emp) {
-                $_SESSION['status'] = "Employee not found!";
-                $_SESSION['status_code'] = "error";
-                header("Location: list_employee.php");
-                exit();
-            }
-
-            $leave_vacation_balance = (int)$emp['vacation_balance'];
-            $leave_vacation_deduction = max(0, $leave_vacation_balance - $leave_used_vacation);
-
-            // 1. UPDATE LEAVE STATUS IN LEAVE PROFILE
-            $update_profile_sql = "UPDATE tbl_employee_leave_profile 
-                               SET status_leave = :status_leave
-                               WHERE id = :id";
-
-            $update_profile_stmt = $con->prepare($update_profile_sql);
-            $update_profile_stmt->execute([
-                ':status_leave' => 'APPROVED',
-                ':id'       => $leave_id_view
-            ]);
-
-            // 2. UPDATE LEAVE BALANCE IN EMPLOYEE INFO
-            $update_leave_sql = "UPDATE tbl_employee_info 
-                             SET vacation_balance = :vacation_balance
-                             WHERE emp_id = :emp_id";
-
-            $update_leave_stmt = $con->prepare($update_leave_sql);
-            $update_leave_stmt->execute([
-                ':vacation_balance' => $leave_vacation_deduction,
-                ':emp_id'        => $emp_id_view
-            ]);
-        }
-        // SUCCESS OR FAILURE MESSAGE
-        if ($update_profile_stmt->rowCount() > 0 || $update_leave_stmt->rowCount() > 0) {
-            $_SESSION['status'] = "Leave approved and balance updated!";
+            $_SESSION['status'] = "Leave approved and deducted successfully!";
             $_SESSION['status_code'] = "success";
-        } else {
-            $_SESSION['status'] = "No changes made.";
-            $_SESSION['status_code'] = "info";
+
+        } catch (Exception $e) {
+            $con->rollBack();
+            $_SESSION['status'] = "ERROR: " . $e->getMessage();
+            $_SESSION['status_code'] = "error";
         }
+
     } else {
-        $_SESSION['status'] = "Missing employee ID.";
+        $_SESSION['status'] = "Missing required fields.";
         $_SESSION['status_code'] = "error";
     }
 
     header('Location: list_leave_profile.php');
     exit();
 }
+
+?>
