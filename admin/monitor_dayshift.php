@@ -44,7 +44,7 @@ LEFT JOIN (
         -- Get the latest log per employee for today, excluding F5
         SELECT emp_id, MAX(date_logs) AS max_log
         FROM tbl_employee_timelogs
-        WHERE schedule_code != ''
+        WHERE schedule_code != '' AND
            schedule_code != 'F5'
         GROUP BY emp_id
     ) t2 
