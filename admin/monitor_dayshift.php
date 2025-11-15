@@ -34,29 +34,24 @@ SELECT
         'offline',
         IF(TIMESTAMPDIFF(MINUTE, r.last_activity, NOW()) <= 5, 'online', 'offline')
     ) AS current_status
-FROM tbl_users r 
+FROM tbl_users r
 LEFT JOIN tbl_employee_info e 
     ON e.emp_id = r.emp_id
 LEFT JOIN (
-    SELECT 
-        emp_id,
-        MAX(punch_in) AS punch_in,
-        MAX(punch_out) AS punch_out,
-        MAX(break_in) AS break_in,
-        MAX(break_out) AS break_out,
-        MAX(lunch_in) AS lunch_in,
-        MAX(lunch_out) AS lunch_out,
-        MAX(schedule_code) AS schedule_code,
-        MAX(date_logs) AS date_logs
-    FROM tbl_employee_timelogs
-    WHERE DATE(date_logs) = :today
-    GROUP BY emp_id
-) t ON t.emp_id = r.emp_id
-    AND (t.schedule_code IS NULL OR t.schedule_code != 'F5')  -- filter F5 but keep users without logs
-ORDER BY r.id ASC;
-
-
-
+    SELECT t1.*
+    FROM tbl_employee_timelogs t1
+    JOIN (
+        -- Get the latest log per employee for today, excluding F5
+        SELECT emp_id, MAX(date_logs) AS max_log
+        FROM tbl_employee_timelogs
+        WHERE DATE(date_logs) = :today
+          AND schedule_code != 'F5'
+        GROUP BY emp_id
+    ) t2 
+    ON t1.emp_id = t2.emp_id AND t1.date_logs = t2.max_log
+) t 
+ON t.emp_id = r.emp_id
+GROUP BY t.emp_id ORDER BY r.id ASC
 ";
 
 $stmt = $con->prepare($sql);

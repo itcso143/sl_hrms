@@ -487,8 +487,8 @@ while ($result4 = $user_data->fetch(PDO::FETCH_ASSOC)) {
             <!-- MODAL FOOTER -->
             <div class="modal-footer">
               <div class="d-flex justify-content-center w-100">
-                <button type="button" id="save_time_in" class="btn btn-primary px-3 mx-2">OverTime In</button>
-                <button type="button" id="save_time_out2" class="btn btn-warning px-3 mx-2">OverTime Out</button>
+                <button type="button" id="save_time_in_ot" class="btn btn-primary px-3 mx-2">OverTime In</button>
+                <button type="button" id="save_time_out_ot" class="btn btn-warning px-3 mx-2">OverTime Out</button>
               </div>
             </div>
 
