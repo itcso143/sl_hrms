@@ -54,8 +54,7 @@ LEFT JOIN (
 ) t ON t.emp_id = r.emp_id
 WHERE 
   (
-        t.schedule_code IS NULL 
-        OR (t.schedule_code != 'F5' AND t.schedule_code != '')
+       (t.schedule_code != 'F5' AND t.schedule_code != '')
       )
 ORDER BY r.id ASC;
 ;
