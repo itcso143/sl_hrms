@@ -41,7 +41,7 @@ LEFT JOIN (
     SELECT t1.*
     FROM tbl_employee_timelogs t1
     JOIN (
-        -- Get the latest log per employee for today
+        -- Get the latest log per employee for today (no F5 filter)
         SELECT emp_id, MAX(date_logs) AS max_log
         FROM tbl_employee_timelogs
         WHERE DATE(date_logs) = :today
@@ -49,10 +49,10 @@ LEFT JOIN (
     ) t2 
     ON t1.emp_id = t2.emp_id 
        AND t1.date_logs = t2.max_log
-       AND t1.schedule_code != 'F5'  -- filter F5 here at the row level
 ) t 
 ON t.emp_id = r.emp_id
 ORDER BY r.id ASC;
+
 ";
 
 $stmt = $con->prepare($sql);

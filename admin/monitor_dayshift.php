@@ -44,14 +44,14 @@ LEFT JOIN (
         -- Get the latest log per employee for today, excluding F5
         SELECT emp_id, MAX(date_logs) AS max_log
         FROM tbl_employee_timelogs
-        WHERE DATE(date_logs) = :today
-          AND schedule_code != 'F5'
+        WHERE schedule_code != ''
+           schedule_code != 'F5'
         GROUP BY emp_id
     ) t2 
     ON t1.emp_id = t2.emp_id AND t1.date_logs = t2.max_log
 ) t 
 ON t.emp_id = r.emp_id
-GROUP BY t.emp_id ORDER BY r.id ASC
+ ORDER BY r.id ASC
 ";
 
 $stmt = $con->prepare($sql);
