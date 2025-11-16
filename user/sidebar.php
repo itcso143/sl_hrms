@@ -122,20 +122,25 @@ while ($result4 = $user_data->fetch(PDO::FETCH_ASSOC)) {
 
     $punch_out_time = $result4['punch_out'];
     $complete_time = "Your daily logs are complete.";
-
-   
   }
 
- $get_logs_sql = "SELECT id,logs_id,punch_out FROM tbl_employee_timelogs WHERE logs_id= :logs_id and punch_out !='' order by id DESC LIMIT 1";
-    $get_logs_data = $con->prepare($get_logs_sql);
-    $get_logs_data->execute([':logs_id' => $get_logs_id]);
-    while ($result4 = $get_logs_data->fetch(PDO::FETCH_ASSOC)) {
+  $get_logs_sql = "SELECT id,logs_id,punch_out FROM tbl_employee_timelogs WHERE logs_id= :logs_id and punch_out !='' order by id DESC LIMIT 1";
+  $get_logs_data = $con->prepare($get_logs_sql);
+  $get_logs_data->execute([':logs_id' => $get_logs_id]);
+  while ($result4 = $get_logs_data->fetch(PDO::FETCH_ASSOC)) {
 
-      $punch_in_open = "OPEN";
-    }
+    $punch_in_open = "OPEN";
+  }
 
-
-
+  $sched_date = '';
+  $ot_code = '';
+  $get_ot_sched_sql = " SELECT sched_emp,ot_code,sched_date FROM tbl_emp_overtime where sched_emp = :sched_emp";
+  $get_ot_sched_data = $con->prepare($get_ot_sched_sql);
+  $get_ot_sched_data->execute([':sched_emp' => $emp_id]);
+  while ($result4 = $get_ot_sched_data->fetch(PDO::FETCH_ASSOC)) {
+    $ot_code = $result4['ot_code'];
+    $sched_date = $result4['sched_date'];
+  }
 
 
   $date_logs1 = date('Y-m-d');
@@ -205,6 +210,13 @@ while ($result4 = $user_data->fetch(PDO::FETCH_ASSOC)) {
   // }
 
 
+  $get_ot_logs_sql = "SELECT id,ot_logs_id FROM tbl_emp_overtime WHERE emp_id= :emp_id order by id DESC LIMIT 1";
+  $get_ot_logs_data = $con->prepare($get_ot_logs_sql);
+  $get_ot_logs_data->execute([':emp_id' => $emp_id]);
+  while ($result4 = $get_ot_logs_data->fetch(PDO::FETCH_ASSOC)) {
+
+    $get_logs_ot = $result4['ot_logs_id'];
+  }
 }
 
 
@@ -276,9 +288,10 @@ while ($result4 = $user_data->fetch(PDO::FETCH_ASSOC)) {
 
         <br>
         <label style="color:yellow"> Schedule Code: <?php echo $schedule; ?></label>
-
-
-
+        <br>
+        <?php if (!empty($ot_code)) : ?>
+          <label style="color:yellow"> OT Code: <?php echo $ot_code; ?></label>
+        <?php endif; ?>
         <!-- <label style="color:yellow"> Shedule In: <?php echo $sched_in; ?></label> -->
         <br>
         <label style="color:lightgreen"> <?php echo $now->format('Y-m-d'); ?> / ONLINE</label>
@@ -299,17 +312,29 @@ while ($result4 = $user_data->fetch(PDO::FETCH_ASSOC)) {
       ?>
 
       <div class="row justify-content-center">
-        <div class="col-md-5 text-center">
+        <div class="col-md-12 text-center">
           <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#timeInModal">
             Attendance
           </button>
         </div>
+      </div>
+      <br>
+      <div class="row justify-content-center">
+        <?php if ($ot_code != '') { ?>
+          <div class="col-md-12 text-center">
+            <button type="button" class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#OverTimeModal">
+              Overtime
+            </button>
+          </div>
+        <?php } else { ?>
+          <div class="col-md-12 text-center">
+            <button hidden type="button" class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#OverTimeModal">
+              Overtime
+            </button>
+          </div>
+        <?php } ?>
 
-        <div class="col-md-5 text-center">
-          <button type="button" class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#OverTimeModal">
-            Over Time
-          </button>
-        </div>
+
       </div>
 
 
@@ -371,11 +396,11 @@ while ($result4 = $user_data->fetch(PDO::FETCH_ASSOC)) {
             <div class="modal-footer py-3">
               <div class="row justify-content-center text-center">
 
-             
-                  <div class="col-auto">
-                    <button  type="button" id="save_time_in" class="btn btn-primary px-3">Time In</button>
-                  </div>
-           
+
+                <div class="col-auto">
+                  <button type="button" id="save_time_in" class="btn btn-primary px-3">Time In</button>
+                </div>
+
 
                 <?php if ($break_in_time != '') { ?>
                   <div class="col-auto">
@@ -448,15 +473,9 @@ while ($result4 = $user_data->fetch(PDO::FETCH_ASSOC)) {
 
             <!-- MODAL HEADER -->
             <div class="modal-header draggable">
-              <h5 class="modal-title" id="timeInModalLabel">Over Time Attendance</h5>
+              <h5 class="modal-title" id="OTModalLabel">OverTime Attendance</h5>
               <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-              <div>
-                <!-- Minimize Button -->
-                <!-- <button type="button" class="btn btn-secondary btn-sm me-2" id="minimizeModal" title="Minimize">–</button> -->
-                <!-- Maximize Button -->
-                <!-- <button type="button" class="btn btn-secondary btn-sm me-2" id="maximizeModal" title="Maximize">⬜</button> -->
 
-              </div>
             </div>
 
 
@@ -474,11 +493,11 @@ while ($result4 = $user_data->fetch(PDO::FETCH_ASSOC)) {
                   <div class="col-md-6 col-sm-8 col-10">
                     <input readonly
                       type="text"
-                      id="logs_id"
-                      name="logs_id"
+                      id="logs_id2"
+                      name="logs_id2"
                       class="form-control text-center"
                       placeholder=""
-                      value="<?php echo $get_logs_id; ?>">
+                      value="<?php echo $get_logs_ot; ?>">
                   </div>
                 </div>
               </h4>
@@ -744,6 +763,13 @@ while ($result4 = $user_data->fetch(PDO::FETCH_ASSOC)) {
             <a href="list_dailylogs" class="nav-link">
               <i class="fa fa-file nav-icon"></i>
               <p>Daily Logs</p>
+            </a>
+          </li>
+
+          <li class="nav-item">
+            <a href="list_overtime" class="nav-link">
+              <i class="fa fa-file nav-icon"></i>
+              <p>Overtime Logs</p>
             </a>
           </li>
 
@@ -1417,6 +1443,103 @@ while ($result4 = $user_data->fetch(PDO::FETCH_ASSOC)) {
     });
   });
 </script>
+
+
+<script>
+  $(document).ready(function() {
+    $('#save_time_in_ot').on('click', function() {
+      const now = new Date();
+      const timeIn = now.toLocaleTimeString();
+
+      // Get emp_id from PHP
+      const emp_id = "<?php echo $emp_id; ?>"; // Inject PHP variable
+
+      // 🔍 Log the values to the browser console
+      console.log("Employee ID:", emp_id);
+      console.log("OT Time In:", timeIn);
+
+      // Disable button while saving
+      $('#save_time_in_ot').prop('disabled', true).text('Saving...');
+
+      // AJAX request
+      $.ajax({
+        url: 'save_time_in_ot.php',
+        type: 'POST',
+        data: {
+          emp_id_2: emp_id // send employee ID
+
+
+
+        },
+        success: function(response) {
+          console.log('Server response:', response);
+          alert('Over Time In saved successfully!');
+          $('#save_time_in_ot').prop('disabled', false).text('Confirm OverTime In');
+          $('#OverTimeModal').modal('hide');
+
+          // 🔄 Reload the page
+          location.reload();
+        },
+        error: function(xhr, status, error) {
+          console.error('AJAX Error:', error);
+          alert('Something went wrong. Please try again.');
+          $('#save_time_in_ot').prop('disabled', false).text('Confirm OverTime In');
+        }
+      });
+    });
+  });
+</script>
+
+<script>
+  $(document).ready(function() {
+    $('#save_time_out_ot').on('click', function() {
+      const now = new Date();
+      const timeIn = now.toLocaleTimeString();
+
+      // Get emp_id from PHP
+      const emp_id = "<?php echo $emp_id; ?>"; // Inject PHP variable
+
+      // 🔍 Log the values to the browser console
+      console.log("Employee ID:", emp_id);
+      console.log("OT Time In:", timeIn);
+
+      // Disable button while saving
+      $('#save_time_out_ot').prop('disabled', true).text('Saving...');
+
+      // AJAX request
+      $.ajax({
+        url: 'save_time_out_ot.php',
+        type: 'POST',
+        data: {
+          emp_id_2: emp_id // send employee ID
+
+
+
+        },
+        success: function(response) {
+          console.log('Server response:', response);
+          alert('OverTime out saved successfully!');
+          $('#save_time_out_ot').prop('disabled', false).text('Confirm OverTime Out');
+          $('#OverTimeModal').modal('hide');
+
+          // 🔄 Reload the page
+          location.reload();
+        },
+        error: function(xhr, status, error) {
+          console.error('AJAX Error:', error);
+          alert('Something went wrong. Please try again.');
+          $('#save_time_out_ot').prop('disabled', false).text('Confirm OverTime Out');
+        }
+      });
+    });
+  });
+</script>
+
+
+
+
+
+
 <script>
   const modalDialog = document.querySelector('#timeInModal .modal-dialog');
   const header = modalDialog.querySelector('.modal-header');
