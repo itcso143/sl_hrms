@@ -132,14 +132,38 @@ while ($result4 = $user_data->fetch(PDO::FETCH_ASSOC)) {
     $punch_in_open = "OPEN";
   }
 
-  $sched_date = '';
+
+
+  //OVERT TIME CONDITION BUTTON
   $ot_code = '';
-  $get_ot_sched_sql = " SELECT sched_emp,ot_code,sched_date FROM tbl_emp_overtime where sched_emp = :sched_emp";
+  $ot_date_from = '';
+  $ot_date_to = '';
+  $sched_time_from_24 = '';
+  $sched_time_to_24 = '';
+  $sched_time_from_ampm = '';
+  $sched_time_to_ampm = '';
+
+  $get_ot_sched_sql = "
+    SELECT *
+    FROM tbl_emp_overtime
+    WHERE sched_emp = :sched_emp
+      AND '$date' BETWEEN sched_date_from AND sched_date_to 
+";
+
   $get_ot_sched_data = $con->prepare($get_ot_sched_sql);
   $get_ot_sched_data->execute([':sched_emp' => $emp_id]);
-  while ($result4 = $get_ot_sched_data->fetch(PDO::FETCH_ASSOC)) {
+
+  $result4 = $get_ot_sched_data->fetch(PDO::FETCH_ASSOC);
+  if ($result4) {
     $ot_code = $result4['ot_code'];
-    $sched_date = $result4['sched_date'];
+
+    $ot_date_from = $result4['sched_date_from'];
+    $ot_date_to = $result4['sched_date_to'];
+
+    $sched_time_from_24 = $result4['sched_time_from']; // e.g., "14:30:00"
+    $sched_time_to_24   = $result4['sched_time_to'];   // e.g., "18:00:00"
+    $sched_time_from_ampm = date("h:i A", strtotime($sched_time_from_24));
+    $sched_time_to_ampm   = date("h:i A", strtotime($sched_time_to_24));
   }
 
 
@@ -291,6 +315,12 @@ while ($result4 = $user_data->fetch(PDO::FETCH_ASSOC)) {
         <br>
         <?php if (!empty($ot_code)) : ?>
           <label style="color:yellow"> OT Code: <?php echo $ot_code; ?></label>
+          <br>
+          <label style="color:yellow"> Sched Date OT:</label>
+          <label> <?php echo $ot_date_from; ?> - <?php echo $ot_date_to; ?></label>
+          <br>
+          <label style="color:yellow"> Sched Time OT:</label>
+          <label> <?php echo $sched_time_from_ampm; ?> - <?php echo $sched_time_to_ampm; ?></label>
         <?php endif; ?>
         <!-- <label style="color:yellow"> Shedule In: <?php echo $sched_in; ?></label> -->
         <br>
@@ -1591,4 +1621,7 @@ while ($result4 = $user_data->fetch(PDO::FETCH_ASSOC)) {
   maximizeBtn.addEventListener('click', () => {
     modal.classList.toggle('maximized');
   });
+
+
+  
 </script>

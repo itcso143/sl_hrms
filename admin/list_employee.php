@@ -37,6 +37,10 @@ $get_schedule_sql = "SELECT * FROM tbl_schedule where status ='ACTIVE'";
 $get_schedule_data = $con->prepare($get_schedule_sql);
 $get_schedule_data->execute();
 
+$get_ot_schedule_sql = "SELECT * FROM tbl_ot_schedule where status ='ACTIVE'";
+$get_ot_schedule_data = $con->prepare($get_ot_schedule_sql);
+$get_ot_schedule_data->execute();
+
 $get_company_sql = "SELECT * FROM tbl_company";
 $get_company_data = $con->prepare($get_company_sql);
 $get_company_data->execute();
@@ -162,6 +166,87 @@ $get_emp_netpay_data->execute();
                   <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
                     <input type="submit" name="update_employee_schedule" class="btn btn-primary" value="Update Schedule">
+                  </div>
+                </form>
+
+              </div>
+            </div>
+          </div>
+
+
+          <!-- Schedule ot Modal -->
+          <div class="modal fade" id="modal_ot_schedule" tabindex="-1" aria-labelledby="addOTScheduleModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+              <div class="modal-content">
+
+                <!-- Modal Header -->
+                <div class="modal-header bg-danger text-white">
+                  <h5 class="modal-title" id="addOTScheduleModalLabel">
+                    <i class="fa fa-calendar"></i> Add Overtime Schedule
+                  </h5>
+                  <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+
+                <!-- Modal Body -->
+                <form method="POST" action="update_employee_ot_schedule.php">
+                  <div class="modal-body">
+                    <div class="row">
+                      <div class="col-lg-5">
+                        <label for="emp_id">EMP ID:</label>
+                        <input readonly type="text" name="emp_ot_id" id="emp_ot_id" class="form-control">
+                      </div>
+                    </div>
+
+                    <br>
+
+                    <div class="row">
+                      <div class="col-md-12">
+                        <label for="get_ot_schedule">Select Type of Schedule</label>
+                        <select class="form-control select2" id="get_ot_schedule" name="get_ot_schedule">
+
+                          <option value="" selected disabled>Please select a schedule</option>
+
+                          <?php while ($get_schedule = $get_ot_schedule_data->fetch(PDO::FETCH_ASSOC)) {
+                            $selected = ($get_user_schedule == $get_schedule['sched_code']) ? 'selected' : '';
+                          ?>
+                            <option
+                              <?= $selected; ?>
+                              value="<?= $get_schedule['sched_code']; ?>"
+                              data-timein="<?= $get_schedule['sched_time_in']; ?>"
+                              data-timeout="<?= $get_schedule['sched_time_out']; ?>">
+                              <?= $get_schedule['sched_code']; ?> -
+                              <?= date("h:i A", strtotime($get_schedule['sched_time_in'])); ?> -
+                              <?= date("h:i A", strtotime($get_schedule['sched_time_out'])); ?>
+                            </option>
+                          <?php } ?>
+                        </select>
+                      </div>
+                    </div>
+
+                    <input type="hidden" name="sched_ot_time_in" id="sched_time_in">
+                    <input type="hidden" name="sched_ot_time_out" id="sched_time_out">
+
+                    <br>
+
+                    <div class="row">
+                      <div class="col-lg-6">
+                        <label for="date_from_ot">Date from:</label>
+                        <input type="date" name="date_from_ot" id="date_from_ot" class="form-control" required>
+                      </div>
+
+                      <div class="col-lg-6">
+                        <label for="date_to_ot">Date to:</label>
+                        <input type="date" name="date_to_ot" id="date_to_ot" class="form-control" required>
+                      </div>
+
+
+                    </div>
+                  </div>
+
+                  <!-- Modal Footer -->
+                  <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <input type="submit" name="update_employee_ot_schedule" class="btn btn-primary" value="Update OT Schedule">
                   </div>
                 </form>
 
@@ -931,6 +1016,12 @@ $get_emp_netpay_data->execute();
           </a>
           </li>
 
+                  <li>
+        <a class="dropdown-item" id="modal_ot_schedule" href="#" title="Add OT Schedule" data-bs-toggle="modal" data-bs-target="#addOTScheduleModal">
+           <i class="fa fa-calendar"></i> Add OT Schedule
+          </a>
+          </li>
+
            <li>
         <a class="dropdown-item" id="modal_leave" href="#" title="Add Leave Credits" data-bs-toggle="modal" data-bs-target="#addLeaveModal">
            <i class="fa fa-plus"></i> Add Leave Credits
@@ -1040,6 +1131,36 @@ $get_emp_netpay_data->execute();
 
       });
 
+
+      $("#users tbody").on("click", "#modal_ot_schedule", function() {
+        event.preventDefault();
+        var currow = $(this).closest("tr");
+
+        var emp_id = currow.find("td:eq(0)").text();
+
+        var fullname = currow.find("td:eq(2)").text();
+
+
+
+
+        console.log("test");
+        $('#modal_ot_schedule').modal('show');
+        $('#emp_ot_id').val(emp_id);
+
+        $('#empot_fullname').val(fullname);
+
+        $('#get_ot_schedule').on('change', function() {
+          let timeIn = $(this).find(':selected').data('timein');
+          let timeOut = $(this).find(':selected').data('timeout');
+
+          $('#sched_time_in').val(timeIn);
+          $('#sched_time_out').val(timeOut);
+        });
+
+
+
+      });
+
       $("#users tbody").on("click", "#modal_leave", function() {
         event.preventDefault();
         var currow = $(this).closest("tr");
@@ -1080,7 +1201,7 @@ $get_emp_netpay_data->execute();
         });
 
 
-           $.ajax({
+        $.ajax({
           url: 'get_emp_vacationcredits.php', // your PHP script
           type: 'POST',
           dataType: 'json',
